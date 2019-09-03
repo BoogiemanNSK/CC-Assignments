@@ -1,8 +1,31 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstdio>
 
 #define EXE_NAME "main"
+
+class Token {
+public:
+    void printToken() {
+        printf("TOKEN: %s, POSITION: [%d, %d], DATA: \"%s\"\n", m_type.c_str(), m_line, m_pos, m_data.c_str());
+    }
+
+    Token(const std::string& type, int line, int pos, const std::string& data) {
+        m_type = type;
+        m_line = line;
+        m_pos = pos;
+        m_data = data;
+    }
+
+private:
+    std::string m_type;
+    int m_line;
+    int m_pos;
+    std::string m_data;
+};
+
+bool isEndOfLiteral(char);
 
 int main(int argc, char** argv) {
     if (argc != 2) {
