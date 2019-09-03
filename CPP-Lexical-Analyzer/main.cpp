@@ -74,6 +74,36 @@ int main(int argc, char** argv) {
             }
         }
 
+        // Char check
+        else if (ch == '\'') {
+            ch = in.get();
+            str = "" + ch;
+            
+            ch = in.get();
+            if (ch == '\'') {
+                // LITERAL_CHAR
+            }
+        }
+
+        // String check
+        else if (ch == '\"') {
+            ch = in.get();
+
+            while (ch != '\"') {
+                str += ch;
+                ch = in.get();
+
+                // To prevent infinite loop
+                if (ch == EOF) {
+                    break;
+                }
+            }
+
+            if (ch != EOF) {
+                // LITERAL_STRING
+            }
+        }
+
         // Binary / Octal / Hexadecimal check
         else if (ch == '0') {
             ch = in.get();
