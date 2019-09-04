@@ -79,24 +79,60 @@ int main(int argc, char** argv) {
             }
         }
 
-        // Char literal check
-        else if (ch == '\'') {
-            bool isChar = true;
+        // Char / string literal check
+        else if (ch == '\'' || ch == '\"' || ch == 'u' || ch == 'U' || ch == 'L' || ch == 'R') {
+            bool u8 = false, u = false, U = false, L = false, R = false;
+            
+            if (ch == 'u') {
+                str += ch;
+                ch = in.get();
+                
+                if (ch == '8') {
+                    u8 = true;
+                    str += ch;
+                    ch = in.get();
+                }
+            } else if (ch == 'U') {
+                str += ch;
+                ch = in.get();
+                U = true;
+            } else if (ch == 'L') {
+                str += ch;
+                ch = in.get();
+                L = true;
+            }
 
-            while (isChar) {
+            if (ch == 'R') {
+                str += ch;
+                ch = in.get();
+                R = true;
+            }
+
+            // At this moment it have to be one of brackets, otherwise - mistake, skip.
+            if (ch != '\'' && ch != '\"') {
+                while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                continue;
+            }
+
+            bool isChar = false;
+            if (ch == '\'') {
+                isChar = true;
+            }
+
+            bool isLiteral = true;
+            while (isLiteral) {
                 ch = in.get();
 
                 // Next char is special char
                 if (ch == '\\') {
                     str += ch;
-
                     ch = in.get();
                     str += ch;
                 }
 
                 // End of char or file
-                else if (ch == '\'' || ch == EOF) {
-                    isChar = false;
+                else if ((ch == '\'' && isChar) || (ch == '\"' && !isChar) || ch == EOF) {
+                    isLiteral = false;
                 }
 
                 else {
@@ -104,40 +140,66 @@ int main(int argc, char** argv) {
                 }
             }
 
-            if (ch != EOF && str.length() > 0) {
+            if (ch == EOF) continue;
+            else if (isChar && str.length() > 0 && !u8 && !u && !U && !L && !R) {
                 /* LITERAL_CHAR */
                 std::cout << "LITERAL_CHAR [" << str << "]" << std::endl;
             }
-        }
-
-        // String literal check
-        else if (ch == '\"') {
-            bool isChar = true;
-
-            while (isChar) {
-                ch = in.get();
-
-                // Next char is special char
-                if (ch == '\\') {
-                    str += ch;
-
-                    ch = in.get();
-                    str += ch;
-                }
-
-                // End of char or file
-                else if (ch == '\"' || ch == EOF) {
-                    isChar = false;
-                }
-
-                else {
-                    str += ch;
-                }
+            else if (isChar && str.length() > 0 && u8 && !u && !U && !L && !R) {
+                /* LITERAL_CHAR_UTF-8 */
+                std::cout << "LITERAL_CHAR_UTF-8 [" << str << "]" << std::endl;
             }
-
-            if (ch != EOF) {
+            else if (isChar && str.length() > 0 && !u8 && u && !U && !L && !R) {
+                /* LITERAL_CHAR_UTF-16 */
+                std::cout << "LITERAL_CHAR_UTF-16 [" << str << "]" << std::endl;
+            }
+            else if (isChar && str.length() > 0 && !u8 && !u && U && !L && !R) {
+                /* LITERAL_CHAR_UTF-32 */
+                std::cout << "LITERAL_CHAR_UTF-32 [" << str << "]" << std::endl;
+            }
+            else if (isChar && str.length() > 0 && !u8 && !u && !U && L && !R) {
+                /* LITERAL_CHAR */
+                std::cout << "LITERAL_CHAR_WIDE [" << str << "]" << std::endl;
+            }
+            else if (!isChar && !u8 && !u && !U && !L && !R) {
                 /* LITERAL_STRING */
                 std::cout << "LITERAL_STRING [" << str << "]" << std::endl;
+            }
+            else if (!isChar && u8 && !u && !U && !L && !R) {
+                /* LITERAL_STRING_UTF-8 */
+                std::cout << "LITERAL_STRING_UTF-8 [" << str << "]" << std::endl;
+            }
+            else if (!isChar && !u8 && u && !U && !L && !R) {
+                /* LITERAL_STRING_UTF-16 */
+                std::cout << "LITERAL_STRING_UTF-16 [" << str << "]" << std::endl;
+            }
+            else if (!isChar && !u8 && !u && U && !L && !R) {
+                /* LITERAL_STRING_UTF-32 */
+                std::cout << "LITERAL_STRING_UTF-32 [" << str << "]" << std::endl;
+            }
+            else if (!isChar && !u8 && !u && !U && L && !R) {
+                /* LITERAL_STRING_WIDE */
+                std::cout << "LITERAL_STRING_WIDE [" << str << "]" << std::endl;
+            }
+            else if (!isChar && !u8 && !u && !U && !L && R) {
+                /* LITERAL_STRING_RAW */
+                std::cout << "LITERAL_STRING_RAW [" << str << "]" << std::endl;
+            }
+            else if (!isChar && u8 && !u && !U && !L && R) {
+                /* LITERAL_STRING_RAW_UTF-8 */
+                std::cout << "LITERAL_STRING_RAW_UTF-8 [" << str << "]" << std::endl;
+            }
+            else if (!isChar && !u8 && u && !U && !L && R) {
+                /* LITERAL_STRING_RAW_UTF-16 */
+                std::cout << "LITERAL_STRING_RAW_UTF-16 [" << str << "]" << std::endl;
+            }
+            else if (!isChar && !u8 && !u && U && !L && R) {
+                /* LITERAL_STRING_RAW_UTF-32 */
+                std::cout << "LITERAL_STRING_RAW_UTF-32 [" << str << "]" << std::endl;
+            }
+            else if (!isChar && !u8 && !u && !U && L && R) {
+                /* LITERAL_STRING_RAW_WIDE */
+                std::cout << "LITERAL_STRING_RAW_WIDE [" << str << "]" << std::endl;
             }
         }
 

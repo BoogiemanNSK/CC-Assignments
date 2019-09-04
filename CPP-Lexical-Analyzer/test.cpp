@@ -28,21 +28,23 @@ int main() {
     float k = 123.4e5;
     float l = .1l;
     bool m = false;
+    auto t = 01249.5;
 
-    std::cout << a << endl;
-    std::cout << b << endl;
-    std::cout << c << endl;
-    std::cout << d << endl;
-    std::cout << e << endl;
-    std::cout << f << endl;
-    std::cout << g << endl;
-    std::cout << h << endl;
-    std::cout << i << endl;
-    std::cout << j << endl;
-    std::cout << k << endl;
-    std::cout << l << endl;
-    std::cout << m << endl;
-    std::cout << 1 + 2 + 3 << endl;
+    cout << a << endl;
+    cout << b << endl;
+    cout << c << endl;
+    cout << d << endl;
+    cout << e << endl;
+    cout << f << endl;
+    cout << g << endl;
+    cout << h << endl;
+    cout << i << endl;
+    cout << j << endl;
+    cout << k << endl;
+    cout << l << endl;
+    cout << m << endl;
+    cout << t << endl;
+    cout << 1 + 2 + 3 << endl;
 
     return 0;
 }
