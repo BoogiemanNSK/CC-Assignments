@@ -210,17 +210,27 @@ int main(int argc, char** argv) {
 
             // Hexadecimal (Hex)
             if (ch == 'x' || ch == 'X') {
+                bool isFloat = false;
                 str += ch;
                 ch = in.get();
 
-                // At least one hex digit has to follow prefix - skip if not the case
-                if (!(ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F')) {
+                // At least one hex digit or dot (float) has to follow prefix - skip if not the case
+                if (!(ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F' || ch == '.')) {
                     while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
                     continue;
                 }
                 
-                while (ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F' || ch == '\'') {
-                    if (ch == '\'') {
+                while (ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F' || ch == '\'' || ch == '.') {
+                    if (ch == '.') {
+                        if (isFloat) {
+                            // Cannot have two dots
+                            while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                            skipLiteral = true;
+                            break;
+                        }
+                        isFloat = true;
+                    }
+                    else if (ch == '\'') {
                         ch = in.get();
                         // At least one hex digit has to follow separator - skip if not the case
                         if (!(ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F')) {
@@ -233,6 +243,71 @@ int main(int argc, char** argv) {
                     ch = in.get();
                 }
                 if (skipLiteral) continue;
+
+                // If float - has to have exponent
+                if (isFloat && ch != 'p' && ch != 'P') {
+                    while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                    continue;
+                }
+                
+                if (ch == 'p' || ch == 'P') {
+                    str += ch;
+                    ch = in.get();
+
+                    if (ch == '+' || ch == '-') {
+                        str += ch;
+                        ch = in.get();
+                    }
+
+                    // Must be at least one number
+                    if (!(ch >= '0' && ch <= '9')) {
+                        // Otherwise, mistake - skip literal
+                        while (!isEndOfLiteral(ch) && ch != EOF) {
+                            ch = in.get();
+                        }
+                        continue;
+                    }
+
+                    while (ch >= '0' && ch <= '9' || ch == '\'') {
+                        str += ch;
+                        ch = in.get();
+                    
+                        // At least one digit shoild follow after separator - skip if not the case
+                        if (ch == '\'') {
+                            ch = in.get();
+                            if (!(ch >= '0' && ch <= '9')) {
+                                while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                                skipLiteral = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (skipLiteral) continue;
+
+                    if (ch == 'f' || ch == 'F') {
+                        str += ch;
+                        ch = in.get();
+                        if (isEndOfLiteral(ch)) {
+                            /* LITERAL_HEX_FLOAT_WITH_EXP */
+                            std::cout << "LITERAL_HEX_FLOAT_WITH_EXP [" << str << "]" << std::endl;
+                        }                        
+                    }
+                    else if (ch == 'l' || ch == 'L') {
+                        str += ch;
+                        ch = in.get();
+                        if (isEndOfLiteral(ch)) {
+                            /* LITERAL_HEX_LONG_DOUBLE_WITH_EXP */
+                            std::cout << "LITERAL_HEX_LONG_DOUBLE_WITH_EXP [" << str << "]" << std::endl;
+                        }
+                    }
+                    else if (isEndOfLiteral(ch)) {
+                        /* LITERAL_HEX_DOUBLE_WITH_EXP */
+                        std::cout << "LITERAL_HEX_DOUBLE_WITH_EXP [" << str << "]" << std::endl;
+                    }
+
+                    // Shouldn't have any more symobls after                    
+                    continue;                    
+                }
 
                 std::string suffix = "";
                 while (!isEndOfLiteral(ch) && ch != EOF) {

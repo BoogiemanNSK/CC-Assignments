@@ -29,6 +29,7 @@ int main() {
     float l = .1l;
     bool m = false;
     auto t = 01249.5;
+    auto u = 0x12.3p2;
 
     cout << a << endl;
     cout << b << endl;
@@ -44,6 +45,7 @@ int main() {
     cout << l << endl;
     cout << m << endl;
     cout << t << endl;
+    cout << u << endl;
     cout << 1 + 2 + 3 << endl;
 
     return 0;
