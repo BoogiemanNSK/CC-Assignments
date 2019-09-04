@@ -15,7 +15,7 @@ int main() {
     int e = (25 + 36) * 2;
     char f = 'g';
     char g = 36;
-    string h = "Some string ~~(8:>\n(that was a rat)";
+    string h = "Some string ~~(8:> \n (that was a rat)";
     int i = NUM;
     const int j = 1;
 
@@ -24,6 +24,10 @@ int main() {
         Which is also multi-line.
         ~~(8:> ~~(8:> ~~(8:>
     */
+
+    float k = 123.4e5;
+    float l = .1l;
+    bool m = false;
 
     std::cout << a << endl;
     std::cout << b << endl;
@@ -35,6 +39,9 @@ int main() {
     std::cout << h << endl;
     std::cout << i << endl;
     std::cout << j << endl;
+    std::cout << k << endl;
+    std::cout << l << endl;
+    std::cout << m << endl;
     std::cout << 1 + 2 + 3 << endl;
 
     return 0;

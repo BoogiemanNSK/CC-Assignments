@@ -27,6 +27,7 @@ private:
 };
 
 bool isEndOfLiteral(char);
+bool isPossibleSignBeforeLiteral(char);
 bool isCorrectDecimalSuffix(std::string);
 
 int main(int argc, char** argv) {
@@ -45,14 +46,16 @@ int main(int argc, char** argv) {
 
     char ch = '0';    
     std::string str;
+    bool skipLiteral = false;
 
     while(ch != EOF) {
         // Reading new token
+        skipLiteral = false;
         ch = in.get();
         str = "";
         
-        // End Of File check
-        if (ch == EOF) continue;
+        // End Of File or Sign Before Literal check
+        if (ch == EOF || isPossibleSignBeforeLiteral(ch)) continue;
 
         // Comments check
         else if (ch == '/') {
@@ -101,7 +104,10 @@ int main(int argc, char** argv) {
                 }
             }
 
-            if (ch != EOF && str.length() > 0) /* LITERAL_CHAR */;
+            if (ch != EOF && str.length() > 0) {
+                /* LITERAL_CHAR */
+                std::cout << "LITERAL_CHAR [" << str << "]" << std::endl;
+            }
         }
 
         // String literal check
@@ -129,22 +135,42 @@ int main(int argc, char** argv) {
                 }
             }
 
-            if (ch != EOF) /* LITERAL_STRING */;
+            if (ch != EOF) {
+                /* LITERAL_STRING */
+                std::cout << "LITERAL_STRING [" << str << "]" << std::endl;
+            }
         }
 
         // Binary / Octal / Hexadecimal check
         else if (ch == '0') {
+            str += ch;
             ch = in.get();
 
             // Hexadecimal (Hex)
             if (ch == 'x' || ch == 'X') {
-                str = "0" + ch;
+                str += ch;
                 ch = in.get();
+
+                // At least one hex digit has to follow prefix - skip if not the case
+                if (!(ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F')) {
+                    while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                    continue;
+                }
                 
-                while (ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F') {
+                while (ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F' || ch == '\'') {
+                    if (ch == '\'') {
+                        ch = in.get();
+                        // At least one hex digit has to follow separator - skip if not the case
+                        if (!(ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F')) {
+                            while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                            skipLiteral = true;
+                            break;
+                        }
+                    }
                     str += ch;
                     ch = in.get();
                 }
+                if (skipLiteral) continue;
 
                 std::string suffix = "";
                 while (!isEndOfLiteral(ch) && ch != EOF) {
@@ -154,23 +180,54 @@ int main(int argc, char** argv) {
                 }
                 
                 if (isCorrectDecimalSuffix(suffix)) {
-                    if (suffix == "") /* LITERAL_HEX */;
-                    else if (suffix == "u") /* LITERAL_UNSIGNED_HEX */;
-                    else if (suffix == "l") /* LITERAL_LONG_HEX */;
-                    else if (suffix == "lu" || suffix == "ul") /* LITERAL_UNSIGNED_LONG_HEX */;
-                    else if (suffix == "ull" || suffix == "lul" || suffix == "llu") /* LITERAL_INSIGNED_LONG_LONG_HEX */;
+                    if (suffix == "") {
+                        /* LITERAL_HEX */
+                        std::cout << "LITERAL_HEX [" << str << "]" << std::endl;
+                    }
+                    else if (suffix == "u") {
+                        /* LITERAL_UNSIGNED_HEX */
+                        std::cout << "LITERAL_UNSIGNED_HEX [" << str << "]" << std::endl;
+                    }
+                    else if (suffix == "l") {
+                        /* LITERAL_LONG_HEX */
+                        std::cout << "LITERAL_LONG_HEX [" << str << "]" << std::endl;
+                    }
+                    else if (suffix == "lu" || suffix == "ul") {
+                        /* LITERAL_UNSIGNED_LONG_HEX */
+                        std::cout << "LITERAL_UNSIGNED_LONG_HEX [" << str << "]" << std::endl;
+                    }
+                    else if (suffix == "ull" || suffix == "lul" || suffix == "llu") {
+                        /* LITERAL_UNSIGNED_LONG_LONG_HEX */
+                        std::cout << "LITERAL_UNSIGNED_LONG_LONG_HEX [" << str << "]" << std::endl;
+                    }
                 }
             }
 
             // Binary
             else if (ch == 'b' && ch == 'B') {
-                str = "0" + ch;
+                str += ch;
                 ch = in.get();
                 
-                while (ch == '0' || ch == '1') {
+                // At least one binary digit has to follow prefix - skip if not the case
+                if (!(ch >= '0' && ch <= '9' || ch >= 'a' && ch <= 'f' || ch >= 'A' && ch <= 'F')) {
+                    while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                    continue;
+                }
+
+                while (ch == '0' || ch == '1' || ch == '\'') {
+                    if (ch == '\'') {
+                        ch = in.get();
+                        // At least one binary digit has to follow separator - skip if not the case
+                        if (!(ch == '0' || ch == '1')) {
+                            while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                            skipLiteral = true;
+                            break;
+                        }
+                    }
                     str += ch;
                     ch = in.get();
                 }
+                if (skipLiteral) continue;
 
                 std::string suffix = "";
                 while (!isEndOfLiteral(ch) && ch != EOF) {
@@ -180,22 +237,60 @@ int main(int argc, char** argv) {
                 }
 
                 if (isCorrectDecimalSuffix(suffix)) {
-                    if (suffix == "") /* LITERAL_BINARY */;
-                    else if (suffix == "u") /* LITERAL_UNSIGNED_BINARY */;
-                    else if (suffix == "l") /* LITERAL_LONG_BINARY */;
-                    else if (suffix == "lu" || suffix == "ul") /* LITERAL_UNSIGNED_LONG_BINARY */;
-                    else if (suffix == "ull" || suffix == "lul" || suffix == "llu") /* LITERAL_UNSIGNED_LONG_LONG_BINARY */;
+                    if (suffix == "") {
+                        /* LITERAL_BINARY */
+                        std::cout << "LITERAL_BINARY [" << str << "]" << std::endl;
+                    }
+                    else if (suffix == "u") {
+                        /* LITERAL_UNSIGNED_BINARY */
+                        std::cout << "LITERAL_UNSIGNED_BINARY [" << str << "]" << std::endl;
+                    }
+                    else if (suffix == "l") {
+                        /* LITERAL_LONG_BINARY */
+                        std::cout << "LITERAL_LONG_BINARY [" << str << "]" << std::endl;
+                    }
+                    else if (suffix == "lu" || suffix == "ul") {
+                        /* LITERAL_UNSIGNED_LONG_BINARY */
+                        std::cout << "LITERAL_UNSIGNED_LONG_BINARY [" << str << "]" << std::endl;
+                    }
+                    else if (suffix == "ull" || suffix == "lul" || suffix == "llu") {
+                        /* LITERAL_UNSIGNED_LONG_LONG_BINARY */
+                        std::cout << "LITERAL_UNSIGNED_LONG_LONG_BINARY [" << str << "]" << std::endl;
+                    }
                 }
             }
 
-            // Ineger / Floating-point / Octal
-            else if (ch >= '0' && ch <= '9' || ch == '.' || ch == 'e' || ch == 'E') {
+            // Integer / Floating-point / Octal
+            else if (ch >= '0' && ch <= '9' || ch == '.' || ch == 'e' || ch == 'E' || ch == '\'') {
                 
+                // At least one digit shoild follow after separator - skip if not the case
+                if (ch == '\'') {
+                    ch = in.get();
+                    if (!(ch >= '0' && ch <= '9')) {
+                        while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                        continue;
+                    }
+                }
+
                 // Octal check
-                while (ch >= '0' && ch <= '7') {
+                while (ch >= '0' && ch <= '7' || ch == '\'') {
+                    // At least one digit shoild follow after separator - skip if not the case
+                    if (ch == '\'') {
+                        ch = in.get();
+                        if (!(ch >= '0' && ch <= '9')) {
+                            while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                            skipLiteral = true;
+                            break;
+                        }
+                        // Non-octal digit follows separator
+                        else if (!(ch >= '0' && ch <= '7')) {
+                            break;
+                        }
+                    }
                     str += ch;
                     ch = in.get();
                 }
+                if (skipLiteral) continue;
 
                 // Either octal or mistake
                 if (ch == 'l' || ch == 'L' || ch == 'u' || ch == 'U' || isEndOfLiteral(ch)) {
@@ -208,68 +303,96 @@ int main(int argc, char** argv) {
 
                     // Octal
                     if (isCorrectDecimalSuffix(suffix)) {
-                        if (suffix == "") /* LITERAL_OCTAL */;
-                        else if (suffix == "u") /* LITERAL_UNSIGNED_OCTAL */;
-                        else if (suffix == "l") /* LITERAL_LONG_OCTAL */;
-                        else if (suffix == "lu" || suffix == "ul") /* LITERAL_UNSIGNED_LONG_OCTAL */;
-                        else if (suffix == "ull" || suffix == "lul" || suffix == "llu") /* LITERAL_UNSIGNED_LONG_LONG_OCTAL */;
+                        if (suffix == "") {
+                            /* LITERAL_OCTAL */
+                            std::cout << "LITERAL_OCTAL [" << str << "]" << std::endl;
+                        }
+                        else if (suffix == "u") {
+                            /* LITERAL_UNSIGNED_OCTAL */
+                            std::cout << "LITERAL_UNSIGNED_OCTAL [" << str << "]" << std::endl;
+                        }
+                        else if (suffix == "l") {
+                            /* LITERAL_LONG_OCTAL */
+                            std::cout << "LITERAL_LONG_OCTAL [" << str << "]" << std::endl;
+                        }
+                        else if (suffix == "lu" || suffix == "ul") {
+                            /* LITERAL_UNSIGNED_LONG_OCTAL */
+                            std::cout << "LITERAL_UNSIGNED_LONG_OCTAL [" << str << "]" << std::endl;
+                        }
+                        else if (suffix == "ull" || suffix == "lul" || suffix == "llu") {
+                            /* LITERAL_UNSIGNED_LONG_LONG_OCTAL */
+                            std::cout << "LITERAL_UNSIGNED_LONG_LONG_OCTAL [" << str << "]" << std::endl;
+                        }
                     }
 
                     // Mistake - ignore literal
                     else continue;
                 }
 
-                // Integer check
-                while (ch >= '0' && ch <= '9') {
+                // Remaining integer part
+                while (ch >= '0' && ch <= '9' || ch == '\'') {
                     str += ch;
                     ch = in.get();
-                }
-
-                // Either integer or mistake
-                if (ch == 'l' || ch == 'L' || ch == 'u' || ch == 'U' || isEndOfLiteral(ch)) {
-                    std::string suffix = "";
-                    while (!isEndOfLiteral(ch) && ch != EOF) {
-                        str += ch;
-                        suffix += tolower(ch);
+                    
+                    // At least one digit shoild follow after separator - skip if not the case
+                    if (ch == '\'') {
                         ch = in.get();
+                        if (!(ch >= '0' && ch <= '9')) {
+                            while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                            skipLiteral = true;
+                            break;
+                        }
                     }
-
-                    // Integer
-                    if (isCorrectDecimalSuffix(suffix)) {
-                        if (suffix == "") /* LITERAL_INT */;
-                        else if (suffix == "u") /* LITERAL_UNSIGNED_INT */;
-                        else if (suffix == "l") /* LITERAL_LONG_INT */;
-                        else if (suffix == "lu" || suffix == "ul") /* LITERAL_UNSIGNED_LONG_INT */;
-                        else if (suffix == "ull" || suffix == "lul" || suffix == "llu") /* LITERAL_UNSIGNED_LONG_LONG_INT */;
-                    }
-
-                    // Mistake - ignore literal
-                    else continue;
                 }
+                if (skipLiteral) continue;
 
                 // Decimal point
                 if (ch == '.') {
                     str += ch;
                     ch = in.get();
 
-                    while (ch >= '0' && ch <= '9') {
+                    // Separator cannot follow decimal point 
+                    if (ch == '\'') {
+                        while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                        continue;
+                    }
+
+                    while (ch >= '0' && ch <= '9' || ch == '\'') {
                         str += ch;
                         ch = in.get();
+                    
+                        // At least one digit shoild follow after separator - skip if not the case
+                        if (ch == '\'') {
+                            ch = in.get();
+                            if (!(ch >= '0' && ch <= '9')) {
+                                while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                                skipLiteral = true;
+                                break;
+                            }
+                        }
                     }
+                    if (skipLiteral) continue;
 
                     if (ch == 'f' || ch == 'F') {
                         str += ch;
                         ch = in.get();
-                        if (isEndOfLiteral(ch)) /* LITERAL_FLOAT */;                        
+                        if (isEndOfLiteral(ch)) { 
+                            /* LITERAL_FLOAT */
+                            std::cout << "LITERAL_FLOAT [" << str << "]" << std::endl;
+                        }                        
                     }
-
                     else if (ch == 'l' || ch == 'L') {
                         str += ch;
                         ch = in.get();
-                        if (isEndOfLiteral(ch)) /* LITERAL_LONG_DOUBLE */;
+                        if (isEndOfLiteral(ch)) {
+                            /* LITERAL_LONG_DOUBLE */
+                            std::cout << "LITERAL_LONG_DOUBLE [" << str << "]" << std::endl;
+                        }
                     }
-
-                    else if (isEndOfLiteral(ch)) /* LITERAL_DOUBLE */;
+                    else if (isEndOfLiteral(ch)) {
+                        /* LITERAL_DOUBLE */
+                        std::cout << "LITERAL_DOUBLE [" << str << "]" << std::endl;
+                    }
                 }
 
                 // Exponent
@@ -291,24 +414,42 @@ int main(int argc, char** argv) {
                         continue;
                     }
 
-                    while (ch >= '0' && ch <= '9') {
+                    while (ch >= '0' && ch <= '9' || ch == '\'') {
                         str += ch;
                         ch = in.get();
+                    
+                        // At least one digit shoild follow after separator - skip if not the case
+                        if (ch == '\'') {
+                            ch = in.get();
+                            if (!(ch >= '0' && ch <= '9')) {
+                                while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                                skipLiteral = true;
+                                break;
+                            }
+                        }
                     }
+                    if (skipLiteral) continue;
 
                     if (ch == 'f' || ch == 'F') {
                         str += ch;
                         ch = in.get();
-                        if (isEndOfLiteral(ch)) /* LITERAL_FLOAT_WITH_EXP */;                        
+                        if (isEndOfLiteral(ch)) {
+                            /* LITERAL_FLOAT_WITH_EXP */
+                            std::cout << "LITERAL_FLOAT_WITH_EXP [" << str << "]" << std::endl;
+                        }                        
                     }
-
                     else if (ch == 'l' || ch == 'L') {
                         str += ch;
                         ch = in.get();
-                        if (isEndOfLiteral(ch)) /* LITERAL_LONG_DOUBLE_WITH_EXP */;
+                        if (isEndOfLiteral(ch)) {
+                            /* LITERAL_LONG_DOUBLE_WITH_EXP */
+                            std::cout << "LITERAL_LONG_DOUBLE_WITH_EXP [" << str << "]" << std::endl;
+                        }
                     }
-
-                    else if (isEndOfLiteral(ch)) /* LITERAL_DOUBLE_WITH_EXP */;
+                    else if (isEndOfLiteral(ch)) {
+                        /* LITERAL_DOUBLE_WITH_EXP */
+                        std::cout << "LITERAL_DOUBLE_WITH_EXP [" << str << "]" << std::endl;
+                    }
                 }
 
                 // If reached this line - then mistake
@@ -320,7 +461,10 @@ int main(int argc, char** argv) {
             }
 
             // Just a zero integer
-            else if (isEndOfLiteral(ch)) /* LITERAL_INTEGER */;
+            else if (isEndOfLiteral(ch)) {
+                /* LITERAL_INT */
+                std::cout << "LITERAL_INT [" << str << "]" << std::endl;
+            }
 
         }
 
@@ -330,10 +474,21 @@ int main(int argc, char** argv) {
             ch = in.get();
 
             // Integer check
-            while (ch >= '0' && ch <= '9') {
+            while (ch >= '0' && ch <= '9' || ch == '\'') {
                 str += ch;
                 ch = in.get();
+                    
+                // At least one digit shoild follow after separator - skip if not the case
+                if (ch == '\'') {
+                    ch = in.get();
+                    if (!(ch >= '0' && ch <= '9')) {
+                        while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                        skipLiteral = true;
+                        break;
+                    }
+                }
             }
+            if (skipLiteral) continue;
 
             // Either integer or mistake
             if (ch == 'l' || ch == 'L' || ch == 'u' || ch == 'U' || isEndOfLiteral(ch)) {
@@ -346,11 +501,26 @@ int main(int argc, char** argv) {
 
                 // Integer
                 if (isCorrectDecimalSuffix(suffix)) {
-                    if (suffix == "") /* LITERAL_INT */;
-                    else if (suffix == "u") /* LITERAL_UNSIGNED_INT */;
-                    else if (suffix == "l") /* LITERAL_LONG_INT */;
-                    else if (suffix == "lu" || suffix == "ul") /* LITERAL_UNSIGNED_LONG_INT */;
-                    else if (suffix == "ull" || suffix == "lul" || suffix == "llu") /* LITERAL_UNSIGNED_LONG_LONG_INT */;
+                    if (suffix == "") {
+                        /* LITERAL_INT */
+                        std::cout << "LITERAL_INT [" << str << "]" << std::endl;
+                    }
+                    else if (suffix == "u") {
+                        /* LITERAL_UNSIGNED_INT */
+                        std::cout << "LITERAL_UNSIGNED_INT [" << str << "]" << std::endl;
+                    }
+                    else if (suffix == "l") {
+                        /* LITERAL_LONG_INT */
+                        std::cout << "LITERAL_LONG_INT [" << str << "]" << std::endl;
+                    }
+                    else if (suffix == "lu" || suffix == "ul") {
+                        /* LITERAL_UNSIGNED_LONG_INT */
+                        std::cout << "LITERAL_UNSIGNED_LONG_INT [" << str << "]" << std::endl;
+                    }
+                    else if (suffix == "ull" || suffix == "lul" || suffix == "llu") {
+                        /* LITERAL_UNSIGNED_LONG_LONG_INT */
+                        std::cout << "LITERAL_UNSIGNED_LONG_LONG_INT [" << str << "]" << std::endl;
+                    }
                 }
 
                 // Mistake - ignore literal
@@ -362,24 +532,48 @@ int main(int argc, char** argv) {
                 str += ch;
                 ch = in.get();
 
-                while (ch >= '0' && ch <= '9') {
+                // Separator cannot follow decimal point 
+                if (ch == '\'') {
+                    while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                    continue;
+                }
+
+                while (ch >= '0' && ch <= '9' || ch == '\'') {
                     str += ch;
                     ch = in.get();
+                    
+                    // At least one digit shoild follow after separator - skip if not the case
+                    if (ch == '\'') {
+                            ch = in.get();
+                        if (!(ch >= '0' && ch <= '9')) {
+                            while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                            skipLiteral = true;
+                            break;
+                        }
+                    }
                 }
+                if (skipLiteral) continue;
 
                 if (ch == 'f' || ch == 'F') {
                     str += ch;
                     ch = in.get();
-                    if (isEndOfLiteral(ch)) /* LITERAL_FLOAT */;                        
+                    if (isEndOfLiteral(ch)) { 
+                        /* LITERAL_FLOAT */
+                        std::cout << "LITERAL_FLOAT [" << str << "]" << std::endl;
+                    }                        
                 }
-
                 else if (ch == 'l' || ch == 'L') {
                     str += ch;
                     ch = in.get();
-                    if (isEndOfLiteral(ch)) /* LITERAL_LONG_DOUBLE */;
+                    if (isEndOfLiteral(ch)) {
+                        /* LITERAL_LONG_DOUBLE */
+                        std::cout << "LITERAL_LONG_DOUBLE [" << str << "]" << std::endl;
+                    }
                 }
-
-                else if (isEndOfLiteral(ch)) /* LITERAL_DOUBLE */;
+                else if (isEndOfLiteral(ch)) {
+                    /* LITERAL_DOUBLE */
+                    std::cout << "LITERAL_DOUBLE [" << str << "]" << std::endl;
+                }
             }
 
             // Exponent
@@ -401,24 +595,42 @@ int main(int argc, char** argv) {
                     continue;
                 }
 
-                while (ch >= '0' && ch <= '9') {
+                while (ch >= '0' && ch <= '9' || ch == '\'') {
                     str += ch;
                     ch = in.get();
+
+                    // At least one digit shoild follow after separator - skip if not the case
+                    if (ch == '\'') {
+                        ch = in.get();
+                        if (!(ch >= '0' && ch <= '9')) {
+                            while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                            skipLiteral = true;
+                            break;
+                            }
+                    }
                 }
+                if (skipLiteral) continue;
 
                 if (ch == 'f' || ch == 'F') {
                     str += ch;
                     ch = in.get();
-                    if (isEndOfLiteral(ch)) /* LITERAL_FLOAT_WITH_EXP */;                        
+                    if (isEndOfLiteral(ch)) {
+                        /* LITERAL_FLOAT_WITH_EXP */
+                        std::cout << "LITERAL_FLOAT_WITH_EXP [" << str << "]" << std::endl;
+                    }                        
                 }
-
                 else if (ch == 'l' || ch == 'L') {
                     str += ch;
                     ch = in.get();
-                    if (isEndOfLiteral(ch)) /* LITERAL_LONG_DOUBLE_WITH_EXP */;
+                    if (isEndOfLiteral(ch)) {
+                        /* LITERAL_LONG_DOUBLE_WITH_EXP */
+                        std::cout << "LITERAL_LONG_DOUBLE_WITH_EXP [" << str << "]" << std::endl;
+                    }
                 }
-
-                else if (isEndOfLiteral(ch)) /* LITERAL_DOUBLE_WITH_EXP */;
+                else if (isEndOfLiteral(ch)) {
+                    /* LITERAL_DOUBLE_WITH_EXP */
+                    std::cout << "LITERAL_DOUBLE_WITH_EXP [" << str << "]" << std::endl;
+                }
             }
 
             // If reached this line - then mistake
@@ -434,24 +646,48 @@ int main(int argc, char** argv) {
             str += ch;
             ch = in.get();
 
-            while (ch >= '0' && ch <= '9') {
+            // Separator cannot follow decimal point 
+            if (ch == '\'') {
+                while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                continue;
+            }
+
+            while (ch >= '0' && ch <= '9' || ch == '\'') {
                 str += ch;
                 ch = in.get();
+                    
+                // At least one digit shoild follow after separator - skip if not the case
+                if (ch == '\'') {
+                    ch = in.get();
+                    if (!(ch >= '0' && ch <= '9')) {
+                        while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                        skipLiteral = true;
+                        break;
+                    }
+                }
             }
+            if (skipLiteral) continue;
 
             if (ch == 'f' || ch == 'F') {
                 str += ch;
                 ch = in.get();
-                if (isEndOfLiteral(ch)) /* LITERAL_FLOAT */;                        
+                if (isEndOfLiteral(ch)) { 
+                    /* LITERAL_FLOAT */
+                    std::cout << "LITERAL_FLOAT [" << str << "]" << std::endl;
+                }                        
             }
-
             else if (ch == 'l' || ch == 'L') {
                 str += ch;
                 ch = in.get();
-                if (isEndOfLiteral(ch)) /* LITERAL_LONG_DOUBLE */;
+                if (isEndOfLiteral(ch)) {
+                    /* LITERAL_LONG_DOUBLE */
+                    std::cout << "LITERAL_LONG_DOUBLE [" << str << "]" << std::endl;
+                }
             }
-
-            else if (isEndOfLiteral(ch)) /* LITERAL_DOUBLE */;
+            else if (isEndOfLiteral(ch)) {
+                /* LITERAL_DOUBLE */
+                std::cout << "LITERAL_DOUBLE [" << str << "]" << std::endl;
+            }
 
             // Exponent
             else if (ch == 'e' || ch == 'E') {
@@ -472,24 +708,42 @@ int main(int argc, char** argv) {
                     continue;
                 }
 
-                while (ch >= '0' && ch <= '9') {
+                while (ch >= '0' && ch <= '9' || ch == '\'') {
                     str += ch;
                     ch = in.get();
+                    
+                    // At least one digit shoild follow after separator - skip if not the case
+                    if (ch == '\'') {
+                        ch = in.get();
+                        if (!(ch >= '0' && ch <= '9')) {
+                            while (!isEndOfLiteral(ch) && ch != EOF) ch = in.get();
+                            skipLiteral = true;
+                            break;
+                        }
+                    }
                 }
+                if (skipLiteral) continue;
 
                 if (ch == 'f' || ch == 'F') {
                     str += ch;
                     ch = in.get();
-                    if (isEndOfLiteral(ch)) /* LITERAL_FLOAT_WITH_EXP */;                        
+                    if (isEndOfLiteral(ch)) {
+                        /* LITERAL_FLOAT_WITH_EXP */
+                        std::cout << "LITERAL_FLOAT_WITH_EXP [" << str << "]" << std::endl;
+                    }                        
                 }
-
                 else if (ch == 'l' || ch == 'L') {
                     str += ch;
                     ch = in.get();
-                      if (isEndOfLiteral(ch)) /* LITERAL_LONG_DOUBLE_WITH_EXP */;
+                    if (isEndOfLiteral(ch)) {
+                        /* LITERAL_LONG_DOUBLE_WITH_EXP */
+                        std::cout << "LITERAL_LONG_DOUBLE_WITH_EXP [" << str << "]" << std::endl;
+                    }
                 }
-
-                else if (isEndOfLiteral(ch)) /* LITERAL_DOUBLE_WITH_EXP */;
+                else if (isEndOfLiteral(ch)) {
+                    /* LITERAL_DOUBLE_WITH_EXP */
+                    std::cout << "LITERAL_DOUBLE_WITH_EXP [" << str << "]" << std::endl;
+                }
             }
 
             // Should not be anything after exponent part (mistake)
@@ -505,8 +759,15 @@ int main(int argc, char** argv) {
                 ch = in.get();
             }
 
-            if (str == "true" || str == "false") /* LITERAL_BOOL */;
-            else if (str == "nullptr") /* LITERAL_NULLPTR */;
+            if (str == "true" || str == "false") {
+                /* LITERAL_BOOL */
+                std::cout << "LITERAL_BOOL [" << str << "]" << std::endl;
+            }
+
+            else if (str == "nullptr") {
+                /* LITERAL_NULLPTR */
+                std::cout << "LITERAL_NULLPTR [" << str << "]" << std::endl;
+            }
         }
     }
 
@@ -536,6 +797,31 @@ bool isEndOfLiteral(char c) {
         c == '!' ||
         c == ')' ||
         c == ']';
+}
+
+bool isPossibleSignBeforeLiteral(char c) {
+    return c == ' ' || 
+        c == ';' || 
+        c == ',' ||
+        c == '<' ||
+        c == '>' ||
+        c == ':' ||
+        c == '?' ||
+        c == '/' ||
+        c == '+' ||
+        c == '-' ||
+        c == '*' ||
+        c == '%' ||
+        c == '=' ||
+        c == '^' ||
+        c == '&' ||
+        c == '|' ||
+        c == '!' ||
+        c == '(' ||
+        c == '[' ||
+        c == '{' ||
+        c == '\n'||
+        c == '\t';
 }
 
 bool isCorrectDecimalSuffix(std::string s) {
