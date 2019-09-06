@@ -50,7 +50,10 @@ public:
 
     Token* nextToken() {
         while (m_ch != EOF) {
-            printf("%d [%d, %d]\n", m_ch, m_currentLine, m_cursorPosition);
+            m_str = "";
+            readChar();
+            m_skipLiteral = false;
+
             if (m_ch == '\n') nextLine();
 
             // End Of File or Sign Before Literal check
@@ -601,7 +604,6 @@ public:
                 // Just a zero integer
                 else if (isEndOfLiteral(m_ch)) {
                     /* LITERAL_INT */
-                    std::cout << "LITERAL_INT [" << m_str << "]" << std::endl;
                     return new Token("LITERAL_INT", m_currentLine, m_cursorPosition, m_str);
                 }
 
@@ -812,7 +814,6 @@ public:
                     readChar();
                     if (isEndOfLiteral(m_ch)) { 
                         /* LITERAL_FLOAT */
-                        std::cout << "LITERAL_FLOAT [" << m_str << "]" << std::endl;
                         return new Token("LITERAL_FLOAT", m_currentLine, m_cursorPosition, m_str);
                     }                        
                 }
@@ -821,13 +822,11 @@ public:
                     readChar();
                     if (isEndOfLiteral(m_ch)) {
                         /* LITERAL_LONG_DOUBLE */
-                        std::cout << "LITERAL_LONG_DOUBLE [" << m_str << "]" << std::endl;
                         return new Token("LITERAL_LONG_DOUBLE", m_currentLine, m_cursorPosition, m_str);
                     }
                 }
                 else if (isEndOfLiteral(m_ch)) {
                     /* LITERAL_DOUBLE */
-                    std::cout << "LITERAL_DOUBLE [" << m_str << "]" << std::endl;
                     return new Token("LITERAL_DOUBLE", m_currentLine, m_cursorPosition, m_str);
                 }
 
@@ -950,7 +949,6 @@ int main(int argc, char** argv) {
 
     Token* token;
     token = reader.nextToken();
-    printf("TOKEN\n");
     while(token != nullptr) {
         token->printToken();
         token = reader.nextToken();
@@ -967,7 +965,7 @@ bool isEndOfLiteral(char c) {
         c == '>' ||
         c == ':' ||
         c == '?' ||
-        c == '/' ||
+        //c == '/' ||
         c == '+' ||
         c == '-' ||
         c == '*' ||
@@ -989,7 +987,7 @@ bool isPossibleSignBeforeLiteral(char c) {
         c == '>' ||
         c == ':' ||
         c == '?' ||
-        c == '/' ||
+        //c == '/' || // bug, it won't go check one line comments
         c == '+' ||
         c == '-' ||
         c == '*' ||
