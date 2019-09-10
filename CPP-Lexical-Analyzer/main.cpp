@@ -57,7 +57,7 @@ public:
             if (m_ch == '\n') nextLine();
 
             // End Of File or Sign Before Literal check
-            if (m_ch == EOF || isPossibleSignBeforeLiteral(m_ch)) continue;
+            if (m_ch == EOF) continue;
 
             // Comments check
             else if (m_ch == '/') {
@@ -81,6 +81,9 @@ public:
                     }
                 }
             }
+
+            // Goes after comment to prevent treating comment as division operator
+            else if (isPossibleSignBeforeLiteral(m_ch)) continue;
 
             // Char / string literal check
             else if (m_ch == '\'' || m_ch == '\"' || m_ch == 'u' || m_ch == 'U' || m_ch == 'L' || m_ch == 'R') {
@@ -895,9 +898,13 @@ public:
 
             // Additional check for bool and nullptr
             else {
-                while (!isEndOfLiteral(m_ch) && m_ch != EOF) {
+                while (!isEndOfLiteral(m_ch) && !isPossibleSignBeforeLiteral(m_ch) && m_ch != EOF) {
                     m_str += m_ch;
                     readChar();
+                }
+
+                if (m_ch == '\n') {
+                    nextLine();
                 }
 
                 if (m_str == "true" || m_str == "false") {
@@ -965,7 +972,7 @@ bool isEndOfLiteral(char c) {
         c == '>' ||
         c == ':' ||
         c == '?' ||
-        //c == '/' ||
+        c == '/' ||
         c == '+' ||
         c == '-' ||
         c == '*' ||
@@ -987,7 +994,7 @@ bool isPossibleSignBeforeLiteral(char c) {
         c == '>' ||
         c == ':' ||
         c == '?' ||
-        //c == '/' || // bug, it won't go check one line comments
+        c == '/' ||
         c == '+' ||
         c == '-' ||
         c == '*' ||
