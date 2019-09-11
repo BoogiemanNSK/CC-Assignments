@@ -49,12 +49,15 @@ public:
     }
 
     Token* nextToken() {
+        int tokenStartPosition = 0;
+
         while (m_ch != EOF) {
             m_str = "";
             readChar();
             m_skipLiteral = false;
 
             if (m_ch == '\n') nextLine();
+            tokenStartPosition = m_cursorPosition;
 
             // End Of File or Sign Before Literal check
             if (m_ch == EOF) continue;
@@ -149,63 +152,63 @@ public:
                 if (m_ch == EOF) continue;
                 else if (isChar && m_str.length() > 0 && !u8 && !u && !U && !L && !R) {
                     /* LITERAL_CHAR */
-                    return new Token("LITERAL_CHAR", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_CHAR", m_currentLine, tokenStartPosition, m_str);
                 }
                 else if (isChar && m_str.length() > 0 && u8 && !u && !U && !L && !R) {
                     /* LITERAL_CHAR_UTF-8 */
-                    return new Token("LITERAL_CHAR_UTF-8", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_CHAR_UTF-8", m_currentLine, tokenStartPosition, m_str);
                 }
                 else if (isChar && m_str.length() > 0 && !u8 && u && !U && !L && !R) {
                     /* LITERAL_CHAR_UTF-16 */
-                    return new Token("LITERAL_CHAR_UTF-16", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_CHAR_UTF-16", m_currentLine, tokenStartPosition, m_str);
                 }
                 else if (isChar && m_str.length() > 0 && !u8 && !u && U && !L && !R) {
                     /* LITERAL_CHAR_UTF-32 */
-                    return new Token("LITERAL_CHAR_UTF-32", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_CHAR_UTF-32", m_currentLine, tokenStartPosition, m_str);
                 }
                 else if (isChar && m_str.length() > 0 && !u8 && !u && !U && L && !R) {
                     /* LITERAL_CHAR */
-                    return new Token("LITERAL_CHAR_WIDE", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_CHAR_WIDE", m_currentLine, tokenStartPosition, m_str);
                 }
                 else if (!isChar && !u8 && !u && !U && !L && !R) {
                     /* LITERAL_STRING */
-                    return new Token("LITERAL_STRING", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_STRING", m_currentLine, tokenStartPosition, m_str);
                 }
                 else if (!isChar && u8 && !u && !U && !L && !R) {
                     /* LITERAL_STRING_UTF-8 */
-                    return new Token("LITERAL_STRING_UTF-8", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_STRING_UTF-8", m_currentLine, tokenStartPosition, m_str);
                 }
                 else if (!isChar && !u8 && u && !U && !L && !R) {
                     /* LITERAL_STRING_UTF-16 */
-                    return new Token("LITERAL_STRING_UTF-16", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_STRING_UTF-16", m_currentLine, tokenStartPosition, m_str);
                 }
                 else if (!isChar && !u8 && !u && U && !L && !R) {
                     /* LITERAL_STRING_UTF-32 */
-                    return new Token("LITERAL_STRING_UTF-32", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_STRING_UTF-32", m_currentLine, tokenStartPosition, m_str);
                 }
                 else if (!isChar && !u8 && !u && !U && L && !R) {
                     /* LITERAL_STRING_WIDE */
-                    return new Token("LITERAL_STRING_WIDE", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_STRING_WIDE", m_currentLine, tokenStartPosition, m_str);
                 }
                 else if (!isChar && !u8 && !u && !U && !L && R) {
                     /* LITERAL_STRING_RAW */
-                    return new Token("LITERAL_STRING_RAW", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_STRING_RAW", m_currentLine, tokenStartPosition, m_str);
                 }
                 else if (!isChar && u8 && !u && !U && !L && R) {
                     /* LITERAL_STRING_RAW_UTF-8 */
-                    return new Token("LITERAL_STRING_RAW_UTF-8", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_STRING_RAW_UTF-8", m_currentLine, tokenStartPosition, m_str);
                 }
                 else if (!isChar && !u8 && u && !U && !L && R) {
                     /* LITERAL_STRING_RAW_UTF-16 */
-                    return new Token("LITERAL_STRING_RAW_UTF-16", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_STRING_RAW_UTF-16", m_currentLine, tokenStartPosition, m_str);
                 }
                 else if (!isChar && !u8 && !u && U && !L && R) {
                     /* LITERAL_STRING_RAW_UTF-32 */
-                    return new Token("LITERAL_STRING_RAW_UTF-32", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_STRING_RAW_UTF-32", m_currentLine, tokenStartPosition, m_str);
                 }
                 else if (!isChar && !u8 && !u && !U && L && R) {
                     /* LITERAL_STRING_RAW_WIDE */
-                    return new Token("LITERAL_STRING_RAW_WIDE", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_STRING_RAW_WIDE", m_currentLine, tokenStartPosition, m_str);
                 }
             }
 
@@ -295,7 +298,7 @@ public:
                             readChar();
                             if (isEndOfLiteral(m_ch)) {
                                 /* LITERAL_HEX_FLOAT_WITH_EXP */
-                                return new Token("LITERAL_HEX_FLOAT_WITH_EXP", m_currentLine, m_cursorPosition, m_str);
+                                return new Token("LITERAL_HEX_FLOAT_WITH_EXP", m_currentLine, tokenStartPosition, m_str);
                             }                        
                         }
                         else if (m_ch == 'l' || m_ch == 'L') {
@@ -303,12 +306,12 @@ public:
                             readChar();
                             if (isEndOfLiteral(m_ch)) {
                                 /* LITERAL_HEX_LONG_DOUBLE_WITH_EXP */
-                                return new Token("LITERAL_HEX_LONG_DOUBLE_WITH_EXP", m_currentLine, m_cursorPosition, m_str);
+                                return new Token("LITERAL_HEX_LONG_DOUBLE_WITH_EXP", m_currentLine, tokenStartPosition, m_str);
                             }
                         }
                         else if (isEndOfLiteral(m_ch)) {
                             /* LITERAL_HEX_DOUBLE_WITH_EXP */
-                            return new Token("LITERAL_HEX_DOUBLE_WITH_EXP", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_HEX_DOUBLE_WITH_EXP", m_currentLine, tokenStartPosition, m_str);
                         }
 
                         // Shouldn't have any more symobls after                    
@@ -325,23 +328,23 @@ public:
                     if (isCorrectDecimalSuffix(suffix)) {
                         if (suffix == "") {
                             /* LITERAL_HEX */
-                            return new Token("LITERAL_HEX", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_HEX", m_currentLine, tokenStartPosition, m_str);
                         }
                         else if (suffix == "u") {
                             /* LITERAL_UNSIGNED_HEX */
-                            return new Token("LITERAL_UNSIGNED_HEX", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_UNSIGNED_HEX", m_currentLine, tokenStartPosition, m_str);
                         }
                         else if (suffix == "l") {
                             /* LITERAL_LONG_HEX */
-                            return new Token("LITERAL_LONG_HEX", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_LONG_HEX", m_currentLine, tokenStartPosition, m_str);
                         }
                         else if (suffix == "lu" || suffix == "ul") {
                             /* LITERAL_UNSIGNED_LONG_HEX */
-                            return new Token("LITERAL_UNSIGNED_LONG_HEX", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_UNSIGNED_LONG_HEX", m_currentLine, tokenStartPosition, m_str);
                         }
                         else if (suffix == "ull" || suffix == "lul" || suffix == "llu") {
                             /* LITERAL_UNSIGNED_LONG_LONG_HEX */
-                            return new Token("LITERAL_UNSIGNED_LONG_LONG_HEX", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_UNSIGNED_LONG_LONG_HEX", m_currentLine, tokenStartPosition, m_str);
                         }
                     }
                 }
@@ -383,23 +386,23 @@ public:
                     if (isCorrectDecimalSuffix(suffix)) {
                         if (suffix == "") {
                             /* LITERAL_BINARY */
-                            return new Token("LITERAL_BINARY", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_BINARY", m_currentLine, tokenStartPosition, m_str);
                         }
                         else if (suffix == "u") {
                             /* LITERAL_UNSIGNED_BINARY */
-                            return new Token("LITERAL_UNSIGNED_BINARY", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_UNSIGNED_BINARY", m_currentLine, tokenStartPosition, m_str);
                         }
                         else if (suffix == "l") {
                             /* LITERAL_LONG_BINARY */
-                            return new Token("LITERAL_LONG_BINARY", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_LONG_BINARY", m_currentLine, tokenStartPosition, m_str);
                         }
                         else if (suffix == "lu" || suffix == "ul") {
                             /* LITERAL_UNSIGNED_LONG_BINARY */
-                            return new Token("LITERAL_UNSIGNED_LONG_BINARY", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_UNSIGNED_LONG_BINARY", m_currentLine, tokenStartPosition, m_str);
                         }
                         else if (suffix == "ull" || suffix == "lul" || suffix == "llu") {
                             /* LITERAL_UNSIGNED_LONG_LONG_BINARY */
-                            return new Token("LITERAL_UNSIGNED_LONG_LONG_BINARY", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_UNSIGNED_LONG_LONG_BINARY", m_currentLine, tokenStartPosition, m_str);
                         }
                     }
                 }
@@ -449,23 +452,23 @@ public:
                         if (isCorrectDecimalSuffix(suffix)) {
                             if (suffix == "") {
                                 /* LITERAL_OCTAL */
-                                return new Token("LITERAL_UNSIGNED_LONG_LONG_BINARY", m_currentLine, m_cursorPosition, m_str);
+                                return new Token("LITERAL_UNSIGNED_LONG_LONG_BINARY", m_currentLine, tokenStartPosition, m_str);
                             }
                             else if (suffix == "u") {
                                 /* LITERAL_UNSIGNED_OCTAL */
-                                return new Token("LITERAL_UNSIGNED_LONG_LONG_BINARY", m_currentLine, m_cursorPosition, m_str);
+                                return new Token("LITERAL_UNSIGNED_LONG_LONG_BINARY", m_currentLine, tokenStartPosition, m_str);
                             }
                             else if (suffix == "l") {
                                 /* LITERAL_LONG_OCTAL */
-                                return new Token("LITERAL_UNSIGNED_LONG_LONG_BINARY", m_currentLine, m_cursorPosition, m_str);
+                                return new Token("LITERAL_UNSIGNED_LONG_LONG_BINARY", m_currentLine, tokenStartPosition, m_str);
                             }
                             else if (suffix == "lu" || suffix == "ul") {
                                 /* LITERAL_UNSIGNED_LONG_OCTAL */
-                                return new Token("LITERAL_UNSIGNED_LONG_LONG_BINARY", m_currentLine, m_cursorPosition, m_str);
+                                return new Token("LITERAL_UNSIGNED_LONG_LONG_BINARY", m_currentLine, tokenStartPosition, m_str);
                             }
                             else if (suffix == "ull" || suffix == "lul" || suffix == "llu") {
                                 /* LITERAL_UNSIGNED_LONG_LONG_OCTAL */
-                                return new Token("LITERAL_UNSIGNED_LONG_LONG_BINARY", m_currentLine, m_cursorPosition, m_str);
+                                return new Token("LITERAL_UNSIGNED_LONG_LONG_BINARY", m_currentLine, tokenStartPosition, m_str);
                             }
                         }
 
@@ -522,7 +525,7 @@ public:
                             readChar();
                             if (isEndOfLiteral(m_ch)) { 
                                 /* LITERAL_FLOAT */
-                                return new Token("LITERAL_FLOAT", m_currentLine, m_cursorPosition, m_str);
+                                return new Token("LITERAL_FLOAT", m_currentLine, tokenStartPosition, m_str);
                             }                        
                         }
                         else if (m_ch == 'l' || m_ch == 'L') {
@@ -530,12 +533,12 @@ public:
                             readChar();
                             if (isEndOfLiteral(m_ch)) {
                                 /* LITERAL_LONG_DOUBLE */
-                                return new Token("LITERAL_LONG_DOUBLE", m_currentLine, m_cursorPosition, m_str);
+                                return new Token("LITERAL_LONG_DOUBLE", m_currentLine, tokenStartPosition, m_str);
                             }
                         }
                         else if (isEndOfLiteral(m_ch)) {
                             /* LITERAL_DOUBLE */
-                            return new Token("LITERAL_DOUBLE", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_DOUBLE", m_currentLine, tokenStartPosition, m_str);
                         }
                     }
 
@@ -579,7 +582,7 @@ public:
                             readChar();
                             if (isEndOfLiteral(m_ch)) {
                                 /* LITERAL_FLOAT_WITH_EXP */
-                                return new Token("LITERAL_FLOAT_WITH_EXP", m_currentLine, m_cursorPosition, m_str);
+                                return new Token("LITERAL_FLOAT_WITH_EXP", m_currentLine, tokenStartPosition, m_str);
                             }                        
                         }
                         else if (m_ch == 'l' || m_ch == 'L') {
@@ -587,12 +590,12 @@ public:
                             readChar();
                             if (isEndOfLiteral(m_ch)) {
                                 /* LITERAL_LONG_DOUBLE_WITH_EXP */
-                                return new Token("LITERAL_LONG_DOUBLE_WITH_EXP", m_currentLine, m_cursorPosition, m_str);
+                                return new Token("LITERAL_LONG_DOUBLE_WITH_EXP", m_currentLine, tokenStartPosition, m_str);
                             }
                         }
                         else if (isEndOfLiteral(m_ch)) {
                             /* LITERAL_DOUBLE_WITH_EXP */
-                            return new Token("LITERAL_DOUBLE_WITH_EXP", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_DOUBLE_WITH_EXP", m_currentLine, tokenStartPosition, m_str);
                         }
                     }
 
@@ -607,7 +610,7 @@ public:
                 // Just a zero integer
                 else if (isEndOfLiteral(m_ch)) {
                     /* LITERAL_INT */
-                    return new Token("LITERAL_INT", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_INT", m_currentLine, tokenStartPosition, m_str);
                 }
 
             }
@@ -647,23 +650,23 @@ public:
                     if (isCorrectDecimalSuffix(suffix)) {
                         if (suffix == "") {
                             /* LITERAL_INT */
-                            return new Token("LITERAL_INT", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_INT", m_currentLine, tokenStartPosition, m_str);
                         }
                         else if (suffix == "u") {
                             /* LITERAL_UNSIGNED_INT */
-                            return new Token("LITERAL_UNSIGNED_INT", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_UNSIGNED_INT", m_currentLine, tokenStartPosition, m_str);
                         }
                         else if (suffix == "l") {
                             /* LITERAL_LONG_INT */
-                            return new Token("LITERAL_LONG_INT", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_LONG_INT", m_currentLine, tokenStartPosition, m_str);
                         }
                         else if (suffix == "lu" || suffix == "ul") {
                             /* LITERAL_UNSIGNED_LONG_INT */
-                            return new Token("LITERAL_UNSIGNED_LONG_INT", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_UNSIGNED_LONG_INT", m_currentLine, tokenStartPosition, m_str);
                         }
                         else if (suffix == "ull" || suffix == "lul" || suffix == "llu") {
                             /* LITERAL_UNSIGNED_LONG_LONG_INT */
-                            return new Token("LITERAL_UNSIGNED_LONG_LONG_INT", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_UNSIGNED_LONG_LONG_INT", m_currentLine, tokenStartPosition, m_str);
                         }
                     }
 
@@ -703,7 +706,7 @@ public:
                         readChar();
                         if (isEndOfLiteral(m_ch)) { 
                             /* LITERAL_FLOAT */
-                            return new Token("LITERAL_FLOAT", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_FLOAT", m_currentLine, tokenStartPosition, m_str);
                         }                        
                     }
                     else if (m_ch == 'l' || m_ch == 'L') {
@@ -711,12 +714,12 @@ public:
                         readChar();
                         if (isEndOfLiteral(m_ch)) {
                             /* LITERAL_LONG_DOUBLE */
-                            return new Token("LITERAL_LONG_DOUBLE", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_LONG_DOUBLE", m_currentLine, tokenStartPosition, m_str);
                         }
                     }
                     else if (isEndOfLiteral(m_ch)) {
                         /* LITERAL_DOUBLE */
-                        return new Token("LITERAL_DOUBLE", m_currentLine, m_cursorPosition, m_str);
+                        return new Token("LITERAL_DOUBLE", m_currentLine, tokenStartPosition, m_str);
                     }
                 }
 
@@ -760,7 +763,7 @@ public:
                         readChar();
                         if (isEndOfLiteral(m_ch)) {
                             /* LITERAL_FLOAT_WITH_EXP */
-                            return new Token("LITERAL_FLOAT_WITH_EXP", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_FLOAT_WITH_EXP", m_currentLine, tokenStartPosition, m_str);
                         }                        
                     }
                     else if (m_ch == 'l' || m_ch == 'L') {
@@ -768,12 +771,12 @@ public:
                         readChar();
                         if (isEndOfLiteral(m_ch)) {
                             /* LITERAL_LONG_DOUBLE_WITH_EXP */
-                            return new Token("LITERAL_LONG_DOUBLE_WITH_EXP", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_LONG_DOUBLE_WITH_EXP", m_currentLine, tokenStartPosition, m_str);
                         }
                     }
                     else if (isEndOfLiteral(m_ch)) {
                         /* LITERAL_DOUBLE_WITH_EXP */
-                        return new Token("LITERAL_DOUBLE_WITH_EXP", m_currentLine, m_cursorPosition, m_str);
+                        return new Token("LITERAL_DOUBLE_WITH_EXP", m_currentLine, tokenStartPosition, m_str);
                     }
                 }
 
@@ -817,7 +820,7 @@ public:
                     readChar();
                     if (isEndOfLiteral(m_ch)) { 
                         /* LITERAL_FLOAT */
-                        return new Token("LITERAL_FLOAT", m_currentLine, m_cursorPosition, m_str);
+                        return new Token("LITERAL_FLOAT", m_currentLine, tokenStartPosition, m_str);
                     }                        
                 }
                 else if (m_ch == 'l' || m_ch == 'L') {
@@ -825,12 +828,12 @@ public:
                     readChar();
                     if (isEndOfLiteral(m_ch)) {
                         /* LITERAL_LONG_DOUBLE */
-                        return new Token("LITERAL_LONG_DOUBLE", m_currentLine, m_cursorPosition, m_str);
+                        return new Token("LITERAL_LONG_DOUBLE", m_currentLine, tokenStartPosition, m_str);
                     }
                 }
                 else if (isEndOfLiteral(m_ch)) {
                     /* LITERAL_DOUBLE */
-                    return new Token("LITERAL_DOUBLE", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_DOUBLE", m_currentLine, tokenStartPosition, m_str);
                 }
 
                 // Exponent
@@ -873,7 +876,7 @@ public:
                         readChar();
                         if (isEndOfLiteral(m_ch)) {
                             /* LITERAL_FLOAT_WITH_EXP */
-                            return new Token("LITERAL_FLOAT_WITH_EXP", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_FLOAT_WITH_EXP", m_currentLine, tokenStartPosition, m_str);
                         }                        
                     }
                     else if (m_ch == 'l' || m_ch == 'L') {
@@ -881,12 +884,12 @@ public:
                         readChar();
                         if (isEndOfLiteral(m_ch)) {
                             /* LITERAL_LONG_DOUBLE_WITH_EXP */
-                            return new Token("LITERAL_LONG_DOUBLE_WITH_EXP", m_currentLine, m_cursorPosition, m_str);
+                            return new Token("LITERAL_LONG_DOUBLE_WITH_EXP", m_currentLine, tokenStartPosition, m_str);
                         }
                     }
                     else if (isEndOfLiteral(m_ch)) {
                         /* LITERAL_DOUBLE_WITH_EXP */
-                        return new Token("LITERAL_DOUBLE_WITH_EXP", m_currentLine, m_cursorPosition, m_str);
+                        return new Token("LITERAL_DOUBLE_WITH_EXP", m_currentLine, tokenStartPosition, m_str);
                     }
                 }
 
@@ -909,12 +912,12 @@ public:
 
                 if (m_str == "true" || m_str == "false") {
                     /* LITERAL_BOOL */
-                    return new Token("LITERAL_BOOL", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_BOOL", m_currentLine, tokenStartPosition, m_str);
                 }
 
                 else if (m_str == "nullptr") {
                     /* LITERAL_NULLPTR */
-                    return new Token("LITERAL_NULLPTR", m_currentLine, m_cursorPosition, m_str);
+                    return new Token("LITERAL_NULLPTR", m_currentLine, tokenStartPosition, m_str);
                 }
             }
         }
