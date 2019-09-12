@@ -1,6 +1,6 @@
 CC = clang++
 
-all: test
+all: build
 
 build:
 	@echo "RUNNING BUILD..."
@@ -10,3 +10,7 @@ build:
 test: build
 	@echo "RUNNING ON test.cpp NOW..."
 	@./a.out test.cpp
+
+testwin: build
+	@echo "RUNNING ON test.cpp NOW..."
+	@./a.exe test.cpp
