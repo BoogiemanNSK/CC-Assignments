@@ -49,7 +49,7 @@ public:
     }
 
     Token* nextToken() {
-        int tokenStartPosition = 0;
+        int tokenStartPosition;
 
         while (m_ch != EOF) {
             m_str = "";
@@ -57,6 +57,8 @@ public:
             m_skipLiteral = false;
 
             if (m_ch == '\n') nextLine();
+            
+            // This is the beginning of a new token
             tokenStartPosition = m_cursorPosition;
 
             // End Of File or Sign Before Literal check
@@ -926,7 +928,13 @@ public:
     }
 
     void reset() {
+        if (!m_in.is_open()) {
+            std::cout << "The file is not open. Cannot reset.\n";
+            return;
+        }
 
+        m_in.clear();
+        m_in.seekg(0, std::ios::beg);
     }
 
 private:
