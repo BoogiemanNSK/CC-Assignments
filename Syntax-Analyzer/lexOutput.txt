@@ -1,0 +1,19 @@
+#inclideIDENTIFIER inclide
+ <<stdioIDENTIFIER stdio
+..hIDENTIFIER h
+>>
+
+
+intINT
+ mainIDENTIFIER main
+(()) {{
+
+	printfIDENTIFIER printf
+(("HelloIDENTIFIER Hello
+,, worldIDENTIFIER world
+!!"));;
+	returnRETURN
+ 0LITERAL 0
+;;
+}}
+

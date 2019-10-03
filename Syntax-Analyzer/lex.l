@@ -1,16 +1,17 @@
 DIGIT			[0-9]
 ANYCHAR			[a-zA-Z_]
 HEXCHAR			[a-fA-F0-9]
-EXPONENT		([Ee][+-]?{D}+)
-HEXEXPONENT   	([Pp][+-]?{D}+)
+EXPONENT		([Ee][+-]?{DIGIT}+)
+HEXEXPONENT   	([Pp][+-]?{DIGIT}+)
 FLOATSUFFIX		(f|F|l|L)
 INTSUFFIX       ((u|U)|(u|U)?(l|L|ll|LL)|(l|L|ll|LL)(u|U))
 
 %{
 #include <stdio.h>
-#include "y.tab.h"
 
 void count(void);
+void comment(void);
+void position(void);
 %}
 
 %%
@@ -104,6 +105,10 @@ ANYCHAR?\"(\\.|[^\\"\n])*\" { position(); fprintf(yyout, "STRING_LITERAL %s\n", 
 
 int column = 0;
 
+int yywrap() {
+	return 1;
+}
+
 void position(void)
 {
 	int i;
@@ -129,7 +134,7 @@ void comment(void)
 			return;
 		prev = c;
 	}
-	error("unterminated comment");
+	perror("unterminated comment");
 }
 
 int main( int argc , char** argv)
