@@ -1,0 +1,9 @@
+*.exe
+*.obj
+*.json
+*.out
+.vscode
+Makefile
+
+.idea
+out
