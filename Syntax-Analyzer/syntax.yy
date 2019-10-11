@@ -87,6 +87,73 @@
                 val = _val;
             }
     };
+
+    class CastExpressionNode : public Node {
+        public:
+            Node* node;
+            string typeName;
+
+            string print() {
+                string prefix = typeName.size() > 0 ? typeName + "_CAST(" : "";
+                string suffix = typeName.size() > 0 ? ")" : "";
+                return(prefix + node.print() + suffix);
+            }
+
+            CastExpressionNode(Node* node) {
+                CastExpressionNode::node = node;
+                CastExpressionNode::typeName = "";
+            }
+            
+            CastExpressionNode(string typeName, Node* node) {
+                CastExpressionNode::node = node;
+                CastExpressionNode::typeName = typeName;
+            }
+    }
+
+    class BinaryExpressionNode : public Node {
+        public:
+            vector<string> ops;
+            string _exprType;
+
+            string print() {
+                string res = _exprType + "(" children[0].preint();
+                for (int i = 0; i < ops.size(); i++) {
+                    res += (" " + ops[i] + " ");
+                    res += children[i + 1];
+                }
+                res += ")";
+                return res;
+            }
+
+            MultiplicativeExpressionNode(Node* node) {
+                children = vector<Node*>{node};
+                ops = vector<string>();
+            }
+    }
+
+    class OperatorNode : public Node {
+        public:
+            string _sign;
+
+            public string print() {
+                return("OPERATOR(" + _sign + ")");
+            } 
+
+            OperatorNode(string sign) {
+                _sign = sign;
+            }
+    }
+
+    /*class EnumSpecNode : public Node {
+        public:
+            string _identifier;
+            vector<>
+
+            EnumSpecNode() {
+
+            }
+    }*/
+
 }
 
 // Tokens
@@ -272,10 +339,10 @@ primary_expression:
 ;
 
 postfix_expression:
-      primary_expression
-    | postfix_expression '[' expression ']'
+      primary_expression { $$ = new PostfixExpressionNode($1);}
+    | postfix_expression '[' expression ']' {$1->children.push_back($3); $$ = $1 ;}
     | postfix_expression '(' argument_expression_list ')'
-    | postfix_expression '(' ')'
+    | postfix_expression '(' ')'{$$ = $1;}
     | postfix_expression '.' IDENTIFIER
     | postfix_expression PTR_OP IDENTIFIER
     | postfix_expression INC_OP
@@ -308,200 +375,210 @@ unary_operator:
 ;
 
 cast_expression:
-      unary_expression
-    | '(' type_name ')' cast_expression
+      unary_expression { $$ = new CastExpressionNode($1) }
+    | '(' type_name ')' cast_expression { $$ = new CastExpressionNode($2, $4) }
 ;
 
 multiplicative_expression:
-      cast_expression
-    | multiplicative_expression '*' cast_expression
-    | multiplicative_expression '/' cast_expression
-    | multiplicative_expression '%' cast_expression
+      cast_expression { $$ = new BinaryExpressionNode($1) }
+    | multiplicative_expression '*' cast_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | multiplicative_expression '/' cast_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | multiplicative_expression '%' cast_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 additive_expression:
-      multiplicative_expression
-    | additive_expression '+' multiplicative_expression
-    | additive_expression '-' multiplicative_expression
+      multiplicative_expression { $$ = new BinaryExpressionNode($1) }
+    | additive_expression '+' multiplicative_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | additive_expression '-' multiplicative_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 shift_expression:
-      additive_expression
-    | shift_expression LEFT_OP additive_expression
-    | shift_expression RIGHT_OP additive_expression
+      additive_expression { $$ = new BinaryExpressionNode($1) }
+    | shift_expression LEFT_OP additive_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | shift_expression RIGHT_OP additive_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 relational_expression:
-      shift_expression
-    | relational_expression '<' shift_expression
-    | relational_expression '>' shift_expression
-    | relational_expression LE_OP shift_expression
-    | relational_expression GE_OP shift_expression
+      shift_expression { $$ = new BinaryExpressionNode($1) }
+    | relational_expression '<' shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | relational_expression '>' shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | relational_expression LE_OP shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | relational_expression GE_OP shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 equality_expression:
-      relational_expression
-    | equality_expression EQ_OP relational_expression
-    | equality_expression NE_OP relational_expression
+      relational_expression { $$ = new BinaryExpressionNode($1) }
+    | equality_expression EQ_OP relational_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | equality_expression NE_OP relational_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 and_expression:
-      equality_expression
-    | and_expression '&' equality_expression
+      equality_expression { $$ = new BinaryExpressionNode($1) }
+    | and_expression '&' equality_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 exclusive_or_expression:
-      and_expression
-    | exclusive_or_expression 'ˆ' and_expression
+      and_expression { $$ = new BinaryExpressionNode($1) }
+    | exclusive_or_expression 'ˆ' and_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 inclusive_or_expression:
-      exclusive_or_expression
-    | inclusive_or_expression '|' exclusive_or_expression
+      exclusive_or_expression { $$ = new BinaryExpressionNode($1) }
+    | inclusive_or_expression '|' exclusive_or_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 logical_and_expression:
-      inclusive_or_expression
-    | logical_and_expression AND_OP inclusive_or_expression
+      inclusive_or_expression { $$ = new BinaryExpressionNode($1) }
+    | logical_and_expression AND_OP inclusive_or_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
-logical_or_expression:
-      logical_and_expression
-    | logical_or_expression OR_OP logical_and_expression
+logical_or_expression: 
+      logical_and_expression { $$ = new BinaryExpressionNode($1) }
+    | logical_or_expression OR_OP logical_and_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 conditional_expression:
-      logical_or_expression
-    | logical_or_expression '?' expression ':' conditional_expression
+      logical_or_expression { $$ = new ConditionalExpressionNode($1) }
+    | logical_or_expression '?' expression ':' conditional_expression { $$ =  }
 ;
 
 assignment_expression:
-      conditional_expression
-    | unary_expression assignment_operator assignment_expression
+      conditional_expression { $$ = new AssignmentExpressionNode($1) }
+    | unary_expression assignment_operator assignment_expression { $$ =  }
 ;
 
 assignment_operator:
-      '=' | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | ADD_ASSIGN | SUB_ASSIGN 
-    | LEFT_ASSIGN | RIGHT_ASSIGN | AND_ASSIGN | XOR_ASSIGN | OR_ASSIGN
+      '=' { $$ = new OperatorNode("=") } 
+    | MUL_ASSIGN { $$ = new OperatorNode("*=") }
+    | DIV_ASSIGN { $$ = new OperatorNode("/=") }
+    | MOD_ASSIGN { $$ = new OperatorNode("%=") }
+    | ADD_ASSIGN { $$ = new OperatorNode("+=") }
+    | SUB_ASSIGN { $$ = new OperatorNode("-=") }
+    | LEFT_ASSIGN { $$ = new OperatorNode("<=") }
+    | RIGHT_ASSIGN { $$ = new OperatorNode(">=") }
+    | AND_ASSIGN { $$ = new OperatorNode("&=") }
+    | XOR_ASSIGN { $$ = new OperatorNode("^=") }
+    | OR_ASSIGN { $$ = new OperatorNode("|=") }
 ;
 
 expression:
-      assignment_expression
-    | expression ',' assignment_expression
+      assignment_expression {$$ = new ExpressionNode($1);}
+    | expression ',' assignment_expression {$1->children.push_back($3); $$ = $1 ;}
 ;
 
-conditional_expression:
-    conditional_expression
+conditional_expression: 
+    logical_or_expression {$$ = new ConditionalExpressionNode($1);}
+	| logical_or_expression '?' expression ':' conditional_expression {$$ = new ConditionalExpressionNode($1, $3, $5); ;}
 ;
 
 constant_expression:
-    conditional_expression
+    conditional_expression($$ = new ConstantExpressionNode($1);)
 ;
 
 declaration:
-    declaration_specifiers ';'|
-	declaration_specifiers init_declarator_list ';'
+    declaration_specifiers ';' {$$ = new DeclarationNode($1);}|
+	declaration_specifiers init_declarator_list ';' { $$ = new DeclarationNode($1,$2);}
 ;
 
 declaration_specifiers: 
-    storage_class_specifier |
-	storage_class_specifier declaration_specifiers |
-	type_specifier |
-	type_specifier declaration_specifiers |
-	type_qualifier |
-	type_qualifier declaration_specifiers |
-    function_specifier |
-	function_specifier declaration_specifiers
+    storage_class_specifier {$$ = new DeclarationSpecifierNode($1); }|
+	storage_class_specifier declaration_specifiers {{$$ = new DeclarationSpecifierNode($1, $2);}|
+	type_specifier {$$ = new DeclarationSpecifierNode($1); } |
+	type_specifier declaration_specifiers { $$ = new DeclarationSpecifierNode($1,$2); }|
+	type_qualifier {$$ = new TypeQualifierNode($1);} |
+	type_qualifier declaration_specifiers { $$ = new DeclarationSpecifierNode($1,$2); } |
+    function_specifier { $$ = new DeclarationSpecifierNode($1); } |
+	function_specifier declaration_specifiers { $$ = new DeclarationSpecifierNode($1,$2); }
 ;
 storage_class_specifier:
-	EXTERN |
-	STATIC |
-	AUTO |
-	REGISTER |
+	EXTERN  { $$ = new StorageClassSpecifierNode("extern"); } |
+	STATIC { $$ = new StorageClassSpecifierNode("static"); }  |
+	AUTO { $$ = new StorageClassSpecifierNode("auto"); } |
+	REGISTER { $$ = new StorageClassSpecifierNode("register"); } 
 ;
 init_declarator_list:
-	init_declarator |   
-	init_declarator_list ',' init_declarator
+	init_declarator{$$ = new InitDeclaratorListNode($1);} |   
+	init_declarator_list ',' init_declarator{$1->children.push_back($3); $$ = $1 ;}
 ;
 
 init_declarator:
-	declarator|
-	declarator '=' initializer
+	declarator {$$ = new  InitDeclaratorNode($1);}|
+	declarator '=' initializer{$$ = new  InitDeclaratorNode($1, $3);}
 ;
 
 initializer:
-	assignment_expression |
-	'{' initializer_list '}' |
-	'{' initializer_list ',' '}' 
+	assignment_expression {$$ = new  InitalizerNode($1);} |
+	'{' initializer_list '}' {$$ = new  InitalizerNode($2);}|
+	'{' initializer_list ',' '}' {$$ = new  InitalizerNode($2);}
 ;
 
 initializer_list:
-	initializer |
-	designation initializer |
-	initializer_list ',' initializer |
-	initializer_list ',' designation initializer
+	initializer  {$$ = new  InitalizerListNode($1);}|
+	designation initializer   {$$ = new  InitalizerListNode($1);} |
+	initializer_list ',' initializer {$1->children.push_back($3); $$ = $1 ;} |
+	initializer_list ',' designation initializer{$1->children.push_back($3); $$ = $1 ;}
 ;
 
 designation:
-	designator_list '='
+	designator_list '=' {$$ = new DesignationNode($1);}
 ;
 
 designator_list:
-	designator |
-	designator_list designator
+	designator {$$ = new DesignatorListNode($1);}|
+	designator_list designator{$1->children.push_back($2); $$ = $1 ;}
 ;
 
 designator:
-	'[' constant_expression ']' |
-	'.' IDENTIFIER
+	'[' constant_expression ']'  { $$ = new DesignatorNode($2);}|
+	'.' IDENTIFIER{ $$ = new DesignatorNode(new IdentifierNode($2));}
 ;
 
 declarator: 
-    pointer direct_declarator |
-	direct_declarator
+    pointer direct_declarator {$$ = new DeclaratorNode($1,$2);}|
+	direct_declarator {$$ = new DeclaratorNode($1);}
 ;
 
 pointer:
-	'*' |
-	'*' type_qualifier_list |
-	'*' pointer |
-	'*' type_qualifier_list pointer 
+	'*' {$$ = new PointerNode();}|
+	'*' type_qualifier_list {$$ = new PointerNode($2);}|
+	'*' pointer {$$ = new PointerNode($2);}|
+	'*' type_qualifier_list pointer {$3->children.push_back($2); $$ = $3 ;}
 ;
 
 direct_declarator: 
-    IDENTIFIER |
-	'(' declarator ')' |
-	direct_declarator '[' type_qualifier_list assignment_expression ']' |
-	direct_declarator '[' type_qualifier_list ']' |
-	direct_declarator '[' assignment_expression ']' |
-	direct_declarator '[' STATIC type_qualifier_list assignment_expression ']' |
-	direct_declarator '[' type_qualifier_list STATIC assignment_expression ']' |
-	direct_declarator '[' type_qualifier_list '*' ']' |
-	direct_declarator '[' '*' ']' |
-	direct_declarator '[' ']' |
-	direct_declarator '(' parameter_type_list ')' |
-	direct_declarator '(' identifier_list ')' |
-	direct_declarator '(' ')'
+    IDENTIFIER {$$ = new DirectDeclaratorNode(new IdentifierNode($1));}|
+	'(' declarator ')'{$$ = new DirectDeclaratorNode($2);} |
+	direct_declarator '[' type_qualifier_list assignment_expression ']'{$1->children.push_back($3);$1->children.push_back($4); $$ = $1 ;} |
+	direct_declarator '[' type_qualifier_list ']' {$1->children.push_back($3);$ $$ = $1 ;}|
+	direct_declarator '[' assignment_expression ']' {$1->children.push_back($3);$ $$ = $1 ;}|
+	direct_declarator '[' STATIC type_qualifier_list assignment_expression ']'{$1->children.push_back("static"); $1->children.push_back($4);$1->children.push_back($5); $$ = $1 ;} |
+	direct_declarator '[' type_qualifier_list STATIC assignment_expression ']'{$1->children.push_back($3); $1->children.push_back("static");$1->children.push_back($5); $$ = $1 ;} |
+	direct_declarator '[' type_qualifier_list '*' ']' {$1->children.push_back($3); $$ = $1 ;}|
+	direct_declarator '[' '*' ']' {$$ = $1;} |
+	direct_declarator '[' ']' {$$ = $1;}|
+	direct_declarator '(' parameter_type_list ')' {$1->children.push_back($3); $$ = $1 ;}|
+	direct_declarator '(' identifier_list ')' {$1->children.push_back($3); $$ = $1 ;}|
+	direct_declarator '(' ')'{$$ = $1 ;}
 ;
 
 type_qualifier_list:
-    type_qualifier |
-	type_qualifier_list type_qualifier
+    type_qualifier {$$ = new TypeQualifierListNode($1);} |
+	type_qualifier_list type_qualifier{$1->children.push_back($2); $$ = $1 ;}
 ;
 
 type_qualifier:
-	CONST |
-	RESTRICT |
-	VOLATILE
+	CONST {$$ = new TypeQualifierNode('const');}|
+	RESTRICT  {$$ = new TypeQualifierNode('restrict');}|
+	VOLATILE {$$ = new TypeQualifierNode('volatile');}
 ;
 parameter_type_list: 
-    parameter_list |
-	parameter_list ',' ELLIPSIS
+    parameter_list {$$ = new ParameterTypeList($1);}|
+	parameter_list ',' ELLIPSIS{$$ = new ParameterTypeList($1, 'elipsis');}
 ;
 
 parameter_list:
-	parameter_declaration;|
-	parameter_list ',' parameter_declaration
+	parameter_declaration ';' {$$ = new ParameterListNode($1);}|
+	parameter_list ',' parameter_declaration{$1->children.push_back($3); $$ = $1 ;}
 ;
 
 parameter_declaration:
