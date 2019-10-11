@@ -34,13 +34,13 @@
     class PrimaryExpressionNode : public Node {
         public:
             string print(){
-                return("PrimaryExpressionNode")
+                return("PrimaryExpressionNode");
             }
 
-            PrimaryExpressionNode(){
-
+            PrimaryExpressionNode(Node* expr){
+                children = {expr};
             }
-    }
+    };
 
     
     class IdentifierNode : public Node{
@@ -49,13 +49,40 @@
 
             string print(){
                 return("IDENT(" + ident + ")");
-            }
+            };
 
             IdentifierNode(string _ident){
-                ident = _ident
+                ident = _ident;
             }
-    }
+    };
 
-    %token LITERAL // Numeric literal
+    class NumericLiteralNode : public Node{
+        public:
+            string num;
 
-    %token STRING_LITERAL  // String literal
+            string print(){
+                return("NUMLITERAL(" + num + ")");
+            };
+
+            NumericLiteralNode(string _num){
+                num = _num;
+            }
+    };
+
+
+    class StrLiteralNode : public Node{
+        public:
+            string val;
+
+            string print(){
+                return("STRLITERAL(" + val + ")");
+            }
+
+            StrLiteralNode(string _val){
+                val = _val;
+            }
+    };
+
+int main(){
+     Node* res = &PrimaryExpressionNode(&IdentNode);
+}
