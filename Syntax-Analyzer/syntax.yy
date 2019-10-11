@@ -34,6 +34,24 @@
 
             virtual string print() = 0;
     };
+
+    class PrimaryExpressionNode : public Node {
+        public:
+            string print(){
+                return("PrimaryExpressionNode")
+            }
+
+            PrimaryExpressionNode(){
+
+            }
+    }
+
+    
+    %token IDENTIFIER
+
+    %token LITERAL // Numeric literal
+
+    %token STRING_LITERAL  // String literal
 }
 
 // Tokens
@@ -79,9 +97,9 @@
 
 %token IDENTIFIER
 
-LITERAL // Integer literal
+%token LITERAL // Numeric literal
 
-STRING_LITERAL  // String literal
+%token STRING_LITERAL  // String literal
 
 // // Delimeters
 // %token ;
@@ -140,8 +158,8 @@ STRING_LITERAL  // String literal
 %%
 
 primary_expression:
-      IDENTIFIER
-    | LITERAL
+      IDENTIFIER    { $$ = (Node)PrimaryExpressionNode({&IdentNode($1)}, NULL }
+    | LITERAL       
     | STRING_LITERAL
     | '(' expression ')'
 ;
@@ -160,8 +178,8 @@ postfix_expression:
 ;
 
 argument_expression_list:
-      IDENTIFIER
-    | IDENTIFIER ',' argument_expression_list
+      IDENTIFIER    {$$ = vector<string>(){$1}}
+    | IDENTIFIER ',' argument_expression_list   {$3.push_back($1);$$ = $3}
 ;
 
 unary_expression:
@@ -295,7 +313,7 @@ storage_class_specifier:
 	REGISTER |
 ;
 init_declarator_list:
-	init_declarator |
+	init_declarator |   
 	init_declarator_list ',' init_declarator
 ;
 
