@@ -200,10 +200,10 @@ primary_expression:
 ;
 
 postfix_expression:
-      primary_expression
-    | postfix_expression '[' expression ']'
+      primary_expression { $$ = new PostfixExpressionNode($1);}
+    | postfix_expression '[' expression ']' {$1->children.push_back($3); $$ = $1 ;}
     | postfix_expression '(' argument_expression_list ')'
-    | postfix_expression '(' ')'
+    | postfix_expression '(' ')'{$$ = $1;}
     | postfix_expression '.' IDENTIFIER
     | postfix_expression PTR_OP IDENTIFIER
     | postfix_expression INC_OP
@@ -314,113 +314,114 @@ assignment_operator:
 ;
 
 expression:
-      assignment_expression
-    | expression ',' assignment_expression
+      assignment_expression {$$ = new ExpressionNode($1);}
+    | expression ',' assignment_expression {$1->children.push_back($3); $$ = $1 ;}
 ;
 
-conditional_expression:
-    conditional_expression
+conditional_expression: 
+    logical_or_expression {$$ = new ConditionalExpressionNode($1);}
+	| logical_or_expression '?' expression ':' conditional_expression {$$ = new ConditionalExpressionNode($1, $3, $5); ;}
 ;
 
 constant_expression:
-    conditional_expression
+    conditional_expression($$ = new ConstantExpressionNode($1);)
 ;
 
 declaration:
-    declaration_specifiers ';'|
-	declaration_specifiers init_declarator_list ';'
+    declaration_specifiers ';' {$$ = new DeclarationNode($1);}|
+	declaration_specifiers init_declarator_list ';' { $$ = new DeclarationNode($1,$2);}
 ;
 
 declaration_specifiers: 
-    storage_class_specifier |
-	storage_class_specifier declaration_specifiers |
-	type_specifier |
-	type_specifier declaration_specifiers |
-	type_qualifier |
-	type_qualifier declaration_specifiers |
-    function_specifier |
-	function_specifier declaration_specifiers
+    storage_class_specifier {$$ = new DeclarationSpecifierNode($1); }|
+	storage_class_specifier declaration_specifiers {{$$ = new DeclarationSpecifierNode($1, $2);}|
+	type_specifier {$$ = new DeclarationSpecifierNode($1); } |
+	type_specifier declaration_specifiers { $$ = new DeclarationSpecifierNode($1,$2); }|
+	type_qualifier {$$ = new TypeQualifierNode($1);} |
+	type_qualifier declaration_specifiers { $$ = new DeclarationSpecifierNode($1,$2); } |
+    function_specifier { $$ = new DeclarationSpecifierNode($1); } |
+	function_specifier declaration_specifiers { $$ = new DeclarationSpecifierNode($1,$2); }
 ;
 storage_class_specifier:
-	EXTERN |
-	STATIC |
-	AUTO |
-	REGISTER |
+	EXTERN  { $$ = new StorageClassSpecifierNode("extern"); } |
+	STATIC { $$ = new StorageClassSpecifierNode("static"); }  |
+	AUTO { $$ = new StorageClassSpecifierNode("auto"); } |
+	REGISTER { $$ = new StorageClassSpecifierNode("register"); } 
 ;
 init_declarator_list:
-	init_declarator |   
-	init_declarator_list ',' init_declarator
+	init_declarator{$$ = new InitDeclaratorListNode($1);} |   
+	init_declarator_list ',' init_declarator{$1->children.push_back($3); $$ = $1 ;}
 ;
 
 init_declarator:
-	declarator|
-	declarator '=' initializer
+	declarator {$$ = new  InitDeclaratorNode($1);}|
+	declarator '=' initializer{$$ = new  InitDeclaratorNode($1, $3);}
 ;
 
 initializer:
-	assignment_expression |
-	'{' initializer_list '}' |
-	'{' initializer_list ',' '}' 
+	assignment_expression {$$ = new  InitalizerNode($1);} |
+	'{' initializer_list '}' {$$ = new  InitalizerNode($2);}|
+	'{' initializer_list ',' '}' {$$ = new  InitalizerNode($2);}
 ;
 
 initializer_list:
-	initializer |
-	designation initializer |
-	initializer_list ',' initializer |
-	initializer_list ',' designation initializer
+	initializer  {$$ = new  InitalizerListNode($1);}|
+	designation initializer   {$$ = new  InitalizerListNode($1);} |
+	initializer_list ',' initializer {$1->children.push_back($3); $$ = $1 ;} |
+	initializer_list ',' designation initializer{$1->children.push_back($3); $$ = $1 ;}
 ;
 
 designation:
-	designator_list '='
+	designator_list '=' {$$ = new DesignationNode($1);}
 ;
 
 designator_list:
-	designator |
-	designator_list designator
+	designator {$$ = new DesignatorListNode($1);}|
+	designator_list designator{$1->children.push_back($2); $$ = $1 ;}
 ;
 
 designator:
-	'[' constant_expression ']' |
-	'.' IDENTIFIER
+	'[' constant_expression ']'  { $$ = new DesignatorNode($2);}|
+	'.' IDENTIFIER{ $$ = new DesignatorNode(new IdentifierNode($2));}
 ;
 
 declarator: 
-    pointer direct_declarator |
-	direct_declarator
+    pointer direct_declarator {$$ = new DeclaratorNode($1,$2);}|
+	direct_declarator {$$ = new DeclaratorNode($1);}
 ;
 
 pointer:
-	'*' |
-	'*' type_qualifier_list |
-	'*' pointer |
-	'*' type_qualifier_list pointer 
+	'*' {$$ = new PointerNode();}|
+	'*' type_qualifier_list {$$ = new PointerNode($2);}|
+	'*' pointer {$$ = new PointerNode($2);}|
+	'*' type_qualifier_list pointer {$3->children.push_back($2); $$ = $3 ;}
 ;
 
 direct_declarator: 
-    IDENTIFIER |
-	'(' declarator ')' |
-	direct_declarator '[' type_qualifier_list assignment_expression ']' |
-	direct_declarator '[' type_qualifier_list ']' |
-	direct_declarator '[' assignment_expression ']' |
-	direct_declarator '[' STATIC type_qualifier_list assignment_expression ']' |
-	direct_declarator '[' type_qualifier_list STATIC assignment_expression ']' |
-	direct_declarator '[' type_qualifier_list '*' ']' |
-	direct_declarator '[' '*' ']' |
-	direct_declarator '[' ']' |
-	direct_declarator '(' parameter_type_list ')' |
-	direct_declarator '(' identifier_list ')' |
-	direct_declarator '(' ')'
+    IDENTIFIER {$$ = new DirectDeclaratorNode(new IdentifierNode($1));}|
+	'(' declarator ')'{$$ = new DirectDeclaratorNode($2);} |
+	direct_declarator '[' type_qualifier_list assignment_expression ']'{$1->children.push_back($3);$1->children.push_back($4); $$ = $1 ;} |
+	direct_declarator '[' type_qualifier_list ']' {$1->children.push_back($3);$ $$ = $1 ;}|
+	direct_declarator '[' assignment_expression ']' {$1->children.push_back($3);$ $$ = $1 ;}|
+	direct_declarator '[' STATIC type_qualifier_list assignment_expression ']'{$1->children.push_back("static"); $1->children.push_back($4);$1->children.push_back($5); $$ = $1 ;} |
+	direct_declarator '[' type_qualifier_list STATIC assignment_expression ']'{$1->children.push_back($3); $1->children.push_back("static");$1->children.push_back($5); $$ = $1 ;} |
+	direct_declarator '[' type_qualifier_list '*' ']' {$1->children.push_back($3); $$ = $1 ;}|
+	direct_declarator '[' '*' ']' {$$ = $1;} |
+	direct_declarator '[' ']' {$$ = $1;}|
+	direct_declarator '(' parameter_type_list ')' {$1->children.push_back($3); $$ = $1 ;}|
+	direct_declarator '(' identifier_list ')' {$1->children.push_back($3); $$ = $1 ;}|
+	direct_declarator '(' ')'{$$ = $1 ;}
 ;
 
 type_qualifier_list:
-    type_qualifier |
-	type_qualifier_list type_qualifier
+    type_qualifier {$$ = new TypeQualifierListNode($1);} |
+	type_qualifier_list type_qualifier{$1->children.push_back($2); $$ = $1 ;}
 ;
 
 type_qualifier:
-	CONST |
-	RESTRICT |
-	VOLATILE
+	CONST {$$ = new TypeQualifierNode('const');}|
+	RESTRICT  {$$ = new TypeQualifierNode('restrict');}|
+	VOLATILE {$$ = new TypeQualifierNode('volatile');}
 ;
 parameter_type_list: 
     parameter_list |
