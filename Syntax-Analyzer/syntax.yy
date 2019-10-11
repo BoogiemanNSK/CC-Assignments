@@ -38,20 +38,54 @@
     class PrimaryExpressionNode : public Node {
         public:
             string print(){
-                return("PrimaryExpressionNode")
+                return("PrimaryExpressionNode");
             }
 
-            PrimaryExpressionNode(){
-
+            PrimaryExpressionNode(Node* expr){
+                children = {expr};
             }
-    }
+    };
 
     
-    %token IDENTIFIER
+    class IdentifierNode : public Node{
+        public:
+            string ident;
 
-    %token LITERAL // Numeric literal
+            string print(){
+                return("IDENT(" + ident + ")");
+            };
 
-    %token STRING_LITERAL  // String literal
+            IdentifierNode(string _ident){
+                ident = _ident;
+            }
+    };
+
+    class NumericLiteralNode : public Node{
+        public:
+            string num;
+
+            string print(){
+                return("NUMLITERAL(" + num + ")");
+            };
+
+            NumericLiteralNode(string _num){
+                num = _num;
+            }
+    };
+
+
+    class StrLiteralNode : public Node{
+        public:
+            string val;
+
+            string print(){
+                return("STRLITERAL(" + val + ")");
+            }
+
+            StrLiteralNode(string _val){
+                val = _val;
+            }
+    };
 }
 
 // Tokens
@@ -152,16 +186,17 @@
 %token EQ_OP
 %token NE_OP
 
-%start translation_unit
+// %start translation_unit
+%start primary_expression
 
 // Grammar
 %%
 
 primary_expression:
-      IDENTIFIER    { $$ = (Node)PrimaryExpressionNode({&IdentNode($1)}, NULL }
-    | LITERAL       
-    | STRING_LITERAL
-    | '(' expression ')'
+      IDENTIFIER            { $$ = &PrimaryExpressionNode(&IdentifierNode("ab")); }
+    | LITERAL               { $$ = &PrimaryExpressionNode(&NumericLiteralNode("1")); }
+    | STRING_LITERAL        { $$ = &PrimaryExpressionNode(&StrLiteralNode("String")); }
+    | '(' expression ')'    { $$ = &PrimaryExpressionNode(NULL); }
 ;
 
 postfix_expression:
@@ -178,8 +213,8 @@ postfix_expression:
 ;
 
 argument_expression_list:
-      IDENTIFIER    {$$ = vector<string>(){$1}}
-    | IDENTIFIER ',' argument_expression_list   {$3.push_back($1);$$ = $3}
+      IDENTIFIER    {$$ = vector<string>(){$1};}
+    | IDENTIFIER ',' argument_expression_list   {$3.push_back($1);$$ = $3;}
 ;
 
 unary_expression:
@@ -192,12 +227,12 @@ unary_expression:
 ;
 
 unary_operator:
-      '&'  {$$ = $1} 
-    | '*'  {$$ = $1} 
-    | '+'  {$$ = $1} 
-    | '-'  {$$ = $1} 
-    | '˜'  {$$ = $1} 
-    | '!'  {$$ = $1} 
+      '&'  {$$ = $1;} 
+    | '*'  {$$ = $1;} 
+    | '+'  {$$ = $1;} 
+    | '-'  {$$ = $1;} 
+    | '˜'  {$$ = $1;} 
+    | '!'  {$$ = $1;} 
 ;
 
 cast_expression:
