@@ -1,11 +1,12 @@
-%{
-    %language "c++"
-%}
+%language "c++"
 
 %code top{
     #include <vector>
     #include <string>
-    #include <iostream>
+    #include <iostream> 
+    #include "syntax.tab.cc"
+    #include "stack.hh"
+
 
     using namespace std;
 
@@ -129,11 +130,11 @@
 %token VOLATILE
 %token WHILE
 
-%token IDENTIFIER
+%token <std::string> IDENTIFIER
 
-%token LITERAL // Numeric literal
+%token <std::string> LITERAL // Numeric literal
 
-%token STRING_LITERAL  // String literal
+%token <std::string> STRING_LITERAL  // String literal
 
 // // Delimeters
 // %token ;
@@ -192,11 +193,82 @@
 // Grammar
 %%
 
+%type <Node*> primary_expression;
+%type <Node*> postfix_expression;
+%type <Node*> argument_expression_list;
+%type <Node*> unary_expression;
+%type <Node*> unary_operator;
+%type <Node*> cast_expression;
+%type <Node*> multiplicative_expression;
+%type <Node*> additive_expression;
+%type <Node*> shift_expression;
+%type <Node*> relational_expression;
+%type <Node*> equality_expression;
+%type <Node*> and_expression;
+%type <Node*> exclusive_or_expression;
+%type <Node*> inclusive_or_expression;
+%type <Node*> logical_and_expression;
+%type <Node*> logical_or_expression;
+%type <Node*> conditional_expression;
+%type <Node*> assignment_expression;
+%type <Node*> assignment_operator;
+%type <Node*> expression;
+%type <Node*> constant_expression;
+%type <Node*> declaration;
+%type <Node*> declaration_specifiers; 
+%type <Node*> storage_class_specifier;
+%type <Node*> init_declarator_list;
+%type <Node*> init_declarator;
+%type <Node*> initializer;
+%type <Node*> initializer_list;
+%type <Node*> designation;
+%type <Node*> designator_list;
+%type <Node*> designator;
+%type <Node*> declarator; 
+%type <Node*> pointer;
+%type <Node*> direct_declarator; 
+%type <Node*> type_qualifier_list;
+%type <Node*> type_qualifier;
+%type <Node*> parameter_type_list; 
+%type <Node*> parameter_list;
+%type <Node*> parameter_declaration;
+%type <Node*> function_specifier; 
+%type <Node*> type_specifier;
+%type <Node*> struct_or_union_specifier;
+%type <Node*> struct_or_union;
+%type <Node*> struct_declaration_list;
+%type <Node*> struct_declaration;
+%type <Node*> struct_declarator_list;
+%type <Node*> struct_declarator;
+%type <Node*> specifier_qualifier_list;
+%type <Node*> enum_specifier; 
+%type <Node*> enumerator_list;
+%type <Node*> enumerator; 
+%type <Node*> type_name;
+%type <Node*> abstract_declarator;
+%type <Node*> direct_abstract_declarator;
+%type <Node*> statement;
+%type <Node*> labeled_statement;
+%type <Node*> compound_statement;
+%type <Node*> block_item_list;
+%type <Node*> block_item;
+%type <Node*> expression_statement;
+%type <Node*> selection_statement;
+%type <Node*> iteration_statement;
+%type <Node*> jump_statement; 
+%type <Node*> translation_unit;
+%type <Node*> external_declaration;
+%type <Node*> function_definition;
+%type <Node*> declaration_list; 
+%type <Node*> identifier_list;
+
+
+
 primary_expression:
-      IDENTIFIER            { $$ = &PrimaryExpressionNode(&IdentifierNode("ab")); }
-    | LITERAL               { $$ = &PrimaryExpressionNode(&NumericLiteralNode("1")); }
-    | STRING_LITERAL        { $$ = &PrimaryExpressionNode(&StrLiteralNode("String")); }
-    | '(' expression ')'    { $$ = &PrimaryExpressionNode(NULL); }
+      IDENTIFIER            { $$ = new PrimaryExpressionNode(new IdentifierNode("ab")); }
+    | LITERAL               { $$ = new PrimaryExpressionNode(new NumericLiteralNode("1")); }
+    | STRING_LITERAL        { $$ = new PrimaryExpressionNode(new StrLiteralNode("String")); }
+    | '(' expression ')'    { $$ = new PrimaryExpressionNode(NULL); }
 ;
 
 postfix_expression:
@@ -213,26 +285,26 @@ postfix_expression:
 ;
 
 argument_expression_list:
-      IDENTIFIER    {$$ = vector<string>(){$1};}
-    | IDENTIFIER ',' argument_expression_list   {$3.push_back($1);$$ = $3;}
+      IDENTIFIER
+    | IDENTIFIER ',' argument_expression_list 
 ;
 
 unary_expression:
-      postfix_expression { $$ =  }
-    | INC_OP unary_expression { $$ =  }
-    | DEC_OP unary_expression { $$ =  }
-    | unary_operator cast_expression { $$ =  }
-    | SIZEOF unary_expression { $$ =  }
-    | SIZEOF '(' type_name ')' { $$ =  }
+      postfix_expression 
+    | INC_OP unary_expression 
+    | DEC_OP unary_expression 
+    | unary_operator cast_expression 
+    | SIZEOF unary_expression 
+    | SIZEOF '(' type_name ')' 
 ;
 
 unary_operator:
-      '&'  {$$ = $1;} 
-    | '*'  {$$ = $1;} 
-    | '+'  {$$ = $1;} 
-    | '-'  {$$ = $1;} 
-    | '˜'  {$$ = $1;} 
-    | '!'  {$$ = $1;} 
+      '&'
+    | '*'
+    | '+'
+    | '-'
+    | '˜'
+    | '!'
 ;
 
 cast_expression:
@@ -626,3 +698,11 @@ identifier_list:
 %%
 
 // Epilogue
+
+namespace yy
+
+int main ()
+{
+  yy::parser parse;
+  return parse ();
+}
