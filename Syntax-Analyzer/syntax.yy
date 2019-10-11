@@ -86,6 +86,73 @@
                 val = _val;
             }
     };
+
+    class CastExpressionNode : public Node {
+        public:
+            Node* node;
+            string typeName;
+
+            string print() {
+                string prefix = typeName.size() > 0 ? typeName + "_CAST(" : "";
+                string suffix = typeName.size() > 0 ? ")" : "";
+                return(prefix + node.print() + suffix);
+            }
+
+            CastExpressionNode(Node* node) {
+                CastExpressionNode::node = node;
+                CastExpressionNode::typeName = "";
+            }
+            
+            CastExpressionNode(string typeName, Node* node) {
+                CastExpressionNode::node = node;
+                CastExpressionNode::typeName = typeName;
+            }
+    }
+
+    class BinaryExpressionNode : public Node {
+        public:
+            vector<string> ops;
+            string _exprType;
+
+            string print() {
+                string res = _exprType + "(" children[0].preint();
+                for (int i = 0; i < ops.size(); i++) {
+                    res += (" " + ops[i] + " ");
+                    res += children[i + 1];
+                }
+                res += ")";
+                return res;
+            }
+
+            MultiplicativeExpressionNode(Node* node) {
+                children = vector<Node*>{node};
+                ops = vector<string>();
+            }
+    }
+
+    class OperatorNode : public Node {
+        public:
+            string _sign;
+
+            public string print() {
+                return("OPERATOR(" + _sign + ")");
+            } 
+
+            OperatorNode(string sign) {
+                _sign = sign;
+            }
+    }
+
+    /*class EnumSpecNode : public Node {
+        public:
+            string _identifier;
+            vector<>
+
+            EnumSpecNode() {
+
+            }
+    }*/
+
 }
 
 // Tokens
@@ -236,81 +303,90 @@ unary_operator:
 ;
 
 cast_expression:
-      unary_expression
-    | '(' type_name ')' cast_expression
+      unary_expression { $$ = new CastExpressionNode($1) }
+    | '(' type_name ')' cast_expression { $$ = new CastExpressionNode($2, $4) }
 ;
 
 multiplicative_expression:
-      cast_expression
-    | multiplicative_expression '*' cast_expression
-    | multiplicative_expression '/' cast_expression
-    | multiplicative_expression '%' cast_expression
+      cast_expression { $$ = new BinaryExpressionNode($1) }
+    | multiplicative_expression '*' cast_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | multiplicative_expression '/' cast_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | multiplicative_expression '%' cast_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 additive_expression:
-      multiplicative_expression
-    | additive_expression '+' multiplicative_expression
-    | additive_expression '-' multiplicative_expression
+      multiplicative_expression { $$ = new BinaryExpressionNode($1) }
+    | additive_expression '+' multiplicative_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | additive_expression '-' multiplicative_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 shift_expression:
-      additive_expression
-    | shift_expression LEFT_OP additive_expression
-    | shift_expression RIGHT_OP additive_expression
+      additive_expression { $$ = new BinaryExpressionNode($1) }
+    | shift_expression LEFT_OP additive_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | shift_expression RIGHT_OP additive_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 relational_expression:
-      shift_expression
-    | relational_expression '<' shift_expression
-    | relational_expression '>' shift_expression
-    | relational_expression LE_OP shift_expression
-    | relational_expression GE_OP shift_expression
+      shift_expression { $$ = new BinaryExpressionNode($1) }
+    | relational_expression '<' shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | relational_expression '>' shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | relational_expression LE_OP shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | relational_expression GE_OP shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 equality_expression:
-      relational_expression
-    | equality_expression EQ_OP relational_expression
-    | equality_expression NE_OP relational_expression
+      relational_expression { $$ = new BinaryExpressionNode($1) }
+    | equality_expression EQ_OP relational_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | equality_expression NE_OP relational_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 and_expression:
-      equality_expression
-    | and_expression '&' equality_expression
+      equality_expression { $$ = new BinaryExpressionNode($1) }
+    | and_expression '&' equality_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 exclusive_or_expression:
-      and_expression
-    | exclusive_or_expression 'ˆ' and_expression
+      and_expression { $$ = new BinaryExpressionNode($1) }
+    | exclusive_or_expression 'ˆ' and_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 inclusive_or_expression:
-      exclusive_or_expression
-    | inclusive_or_expression '|' exclusive_or_expression
+      exclusive_or_expression { $$ = new BinaryExpressionNode($1) }
+    | inclusive_or_expression '|' exclusive_or_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 logical_and_expression:
-      inclusive_or_expression
-    | logical_and_expression AND_OP inclusive_or_expression
+      inclusive_or_expression { $$ = new BinaryExpressionNode($1) }
+    | logical_and_expression AND_OP inclusive_or_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
-logical_or_expression:
-      logical_and_expression
-    | logical_or_expression OR_OP logical_and_expression
+logical_or_expression: 
+      logical_and_expression { $$ = new BinaryExpressionNode($1) }
+    | logical_or_expression OR_OP logical_and_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 conditional_expression:
-      logical_or_expression
-    | logical_or_expression '?' expression ':' conditional_expression
+      logical_or_expression { $$ = new ConditionalExpressionNode($1) }
+    | logical_or_expression '?' expression ':' conditional_expression { $$ =  }
 ;
 
 assignment_expression:
-      conditional_expression
-    | unary_expression assignment_operator assignment_expression
+      conditional_expression { $$ = new AssignmentExpressionNode($1) }
+    | unary_expression assignment_operator assignment_expression { $$ =  }
 ;
 
 assignment_operator:
-      '=' | MUL_ASSIGN | DIV_ASSIGN | MOD_ASSIGN | ADD_ASSIGN | SUB_ASSIGN 
-    | LEFT_ASSIGN | RIGHT_ASSIGN | AND_ASSIGN | XOR_ASSIGN | OR_ASSIGN
+      '=' { $$ = new OperatorNode("=") } 
+    | MUL_ASSIGN { $$ = new OperatorNode("*=") }
+    | DIV_ASSIGN { $$ = new OperatorNode("/=") }
+    | MOD_ASSIGN { $$ = new OperatorNode("%=") }
+    | ADD_ASSIGN { $$ = new OperatorNode("+=") }
+    | SUB_ASSIGN { $$ = new OperatorNode("-=") }
+    | LEFT_ASSIGN { $$ = new OperatorNode("<=") }
+    | RIGHT_ASSIGN { $$ = new OperatorNode(">=") }
+    | AND_ASSIGN { $$ = new OperatorNode("&=") }
+    | XOR_ASSIGN { $$ = new OperatorNode("^=") }
+    | OR_ASSIGN { $$ = new OperatorNode("|=") }
 ;
 
 expression:
