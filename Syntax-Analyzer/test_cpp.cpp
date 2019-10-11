@@ -323,6 +323,33 @@ class DirectDeclaratorList: public Node
         }
     }
 
+    class ParameterClassList:public Node{
+        public:
+            string print(){
+                return(" ParameterClassList")
+            }
+
+         ParameterClassList(Node* n2, string n1){
+            children = vector<Node*>{n2,n1};
+
+        }
+        ParameterClassList(Node* n2){
+            children = vector<Node*>{n2};
+
+        }
+    }
+
+    class  ParameterListNode : public Node{
+        public:
+            string print(){
+                return("ParameterListNode")
+            }
+
+       ParameterListNode(Node* n1){
+            children = vector<Node*>{n1};
+
+        }
+    }
     %token LITERAL // Numeric literal
 
     %token STRING_LITERAL  // String literal

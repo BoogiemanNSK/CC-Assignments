@@ -424,13 +424,13 @@ type_qualifier:
 	VOLATILE {$$ = new TypeQualifierNode('volatile');}
 ;
 parameter_type_list: 
-    parameter_list |
-	parameter_list ',' ELLIPSIS
+    parameter_list {$$ = new ParameterTypeList($1);}|
+	parameter_list ',' ELLIPSIS{$$ = new ParameterTypeList($1, 'elipsis');}
 ;
 
 parameter_list:
-	parameter_declaration;|
-	parameter_list ',' parameter_declaration
+	parameter_declaration ';' {$$ = new ParameterListNode($1);}|
+	parameter_list ',' parameter_declaration{$1->children.push_back($3); $$ = $1 ;}
 ;
 
 parameter_declaration:
