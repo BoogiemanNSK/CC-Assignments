@@ -2,6 +2,40 @@
     %language "c++"
 %}
 
+%code top{
+    #include <vector>
+    #include <string>
+    #include <iostream>
+
+    using namespace std;
+
+    class Node {
+        public:
+            vector<Node*> children;
+            Node* parent;
+            string name;
+            
+            Node(vector<Node*> _children, Node* _parent){
+                children = _children;
+                parent = _parent;
+            }
+            
+            Node(){
+                children = vector<Node*>(1);
+                parent = NULL;
+            }
+
+            void print_tree(){
+                cout << name;
+                for (int i = 0;i<children.size();i++){
+                    cout << " " << children[i]->print();
+                }
+            }
+
+            virtual string print() = 0;
+    };
+}
+
 // Tokens
 
 // Keywords
@@ -100,7 +134,7 @@ STRING_LITERAL  // String literal
 %token EQ_OP
 %token NE_OP
 
-%start primary_expression
+%start translation_unit
 
 // Grammar
 %%
@@ -122,7 +156,7 @@ postfix_expression:
     | postfix_expression INC_OP
     | postfix_expression DEC_OP
     | '(' type_name ')' '{' initializer_list '}'
-    | '(' type_name ')' '{' initializer_list , '}'
+    | '(' type_name ')' '{' initializer_list ',' '}'
 ;
 
 argument_expression_list:
@@ -131,21 +165,26 @@ argument_expression_list:
 ;
 
 unary_expression:
-      postfix_expression
-    | INC_OP unary_expression
-    | DEC_OP unary_expression
-    | unary_operator cast_expression
-    | SIZEOF unary_expression
-    | SIZEOF '(' type_name ')'
+      postfix_expression { $$ =  }
+    | INC_OP unary_expression { $$ =  }
+    | DEC_OP unary_expression { $$ =  }
+    | unary_operator cast_expression { $$ =  }
+    | SIZEOF unary_expression { $$ =  }
+    | SIZEOF '(' type_name ')' { $$ =  }
 ;
 
 unary_operator:
-    '&' | '*' | '+' | '-' | '˜' | '!'
+      '&'  {$$ = $1} 
+    | '*'  {$$ = $1} 
+    | '+'  {$$ = $1} 
+    | '-'  {$$ = $1} 
+    | '˜'  {$$ = $1} 
+    | '!'  {$$ = $1} 
 ;
 
 cast_expression:
       unary_expression
-    | ( type_name ) cast_expression
+    | '(' type_name ')' cast_expression
 ;
 
 multiplicative_expression:
@@ -227,6 +266,10 @@ expression:
 ;
 
 conditional_expression:
+    conditional_expression
+;
+
+constant_expression:
     conditional_expression
 ;
 
@@ -359,7 +402,7 @@ type_specifier:
 	IMAGINARY |
 	struct_or_union_specifier |
 	enum_specifier |
-	TYPE_NAME
+	type_name
 ;
 
 struct_or_union_specifier:
@@ -517,8 +560,15 @@ function_definition:
 	declaration_specifiers declarator compound_statement
 ;
 
+declaration_list: 
+    declaration
+  | declaration_list declaration
+;
 
-
+identifier_list:
+    IDENTIFIER
+  | identifier_list ',' IDENTIFIER
+;
 
 %%
 
