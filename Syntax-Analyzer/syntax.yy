@@ -1303,86 +1303,86 @@ direct_abstract_declarator:
 ;
 
 statement:
-	labeled_statement {} |
-	compound_statement |
-	expression_statement |
-	selection_statement | 
-	iteration_statement |
-	jump_statement
+	labeled_statement { $$ = new StatementNode($1); } |
+	compound_statement { $$ = new StatementNode($1); } |
+	expression_statement { $$ = new StatementNode($1); } |
+	selection_statement { $$ = new StatementNode($1); } | 
+	iteration_statement { $$ = new StatementNode($1); } |
+	jump_statement { $$ = new StatementNode($1); }
 ;
 
 labeled_statement:
-	IDENTIFIER COLON statement |
-	CASE constant_expression COLON statement |
-	DEFAULT COLON statement |
+	IDENTIFIER COLON statement { $$ = new LabeledStatementNode($3); } |
+	CASE constant_expression COLON statement { $$ = new LabeledStatementNode($2, $4); } |
+	DEFAULT COLON statement { $$ = new LabeledStatementNode($3); }
 ;
 
 compound_statement:
-	LEFT_CBRACKET RIGHT_CBRACKET |
-	LEFT_CBRACKET block_item_list RIGHT_CBRACKET
+	LEFT_CBRACKET RIGHT_CBRACKET { $$ = new CompoundStatementNode(); } |
+	LEFT_CBRACKET block_item_list RIGHT_CBRACKET { $$ = new CompoundStatementNode($2); }
 ;
 
 block_item_list:
-	block_item |
-	block_item_list block_item
+	block_item { $$ = new BlockItemList($1); } |
+	block_item_list block_item { $1->children.push_back($2); $$ = $1; }
 ;
 
 block_item:
-	declaration |
-	statement
+	declaration { $$ = new BlockItemNode($1); } |
+	statement { $$ = new BlockItemNode($1); }
 ;
 
 expression_statement:
-	SEMICOLON|
-	expression SEMICOLON
+	SEMICOLON { $$ = new ExpressionStatementNode(); } |
+	expression SEMICOLON { $$ = new ExpressionStatementNode($1); }
 ;
 
 selection_statement:
-	IF LEFT_PAR expression RIGHT_PAR statement |
-    IF LEFT_PAR expression RIGHT_PAR statement ELSE statement |
-	SWITCH LEFT_PAR expression RIGHT_PAR statement
+	IF LEFT_PAR expression RIGHT_PAR statement { $$ = new SelectionStatementNode($3, $5); } |
+    IF LEFT_PAR expression RIGHT_PAR statement ELSE statement { $$ = new SelectionStatementNode($3, $5, $7); } |
+	SWITCH LEFT_PAR expression RIGHT_PAR statement { $$ = new SelectionStatementNode($3, $5); }
 ;
 
 iteration_statement:
-	WHILE LEFT_PAR expression RIGHT_PAR statement |
-	DO statement WHILE LEFT_PAR expression RIGHT_PAR SEMICOLON |
-	FOR LEFT_PAR expression_statement expression_statement RIGHT_PAR statement |
-	FOR LEFT_PAR expression_statement expression_statement expression RIGHT_PAR statement |
-	FOR LEFT_PAR declaration expression_statement RIGHT_PAR statement |
-	FOR LEFT_PAR declaration expression_statement expression RIGHT_PAR statement 
+	WHILE LEFT_PAR expression RIGHT_PAR statement { $$ = new IterationStatementNode($3, $5); } |
+	DO statement WHILE LEFT_PAR expression RIGHT_PAR SEMICOLON { $$ = new IterationStatementNode($2, $5); } |
+	FOR LEFT_PAR expression_statement expression_statement RIGHT_PAR statement { $$ = new IterationStatementNode($3, $4, $6); } |
+	FOR LEFT_PAR expression_statement expression_statement expression RIGHT_PAR statement { $$ = new IterationStatementNode($3, $4, $5, $6); } |
+	FOR LEFT_PAR declaration expression_statement RIGHT_PAR statement { $$ = new IterationStatementNode($3, $4, $6); } |
+	FOR LEFT_PAR declaration expression_statement expression RIGHT_PAR statement { $$ = new IterationStatementNode($3, $4, $5, $6); }
 ;
 
 jump_statement: 
-	GOTO IDENTIFIER SEMICOLON |
-	CONTINUE SEMICOLON |
-	BREAK SEMICOLON | 
-	RETURN SEMICOLON |
-    RETURN expression SEMICOLON
+	GOTO IDENTIFIER SEMICOLON { $$ = new JumpStatementNode($2); } |
+	CONTINUE SEMICOLON { $$ = new JumpStatementNode(); } |
+	BREAK SEMICOLON { $$ = new JumpStatementNode(); } | 
+	RETURN SEMICOLON { $$ = new JumpStatementNode(); } |
+    RETURN expression SEMICOLON { $$ = new JumpStatementNode($2); }
 ;
 
 translation_unit:
-	external_declaration |
-	translation_unit external_declaration
+	external_declaration { $$ = new TranslationUnitNode($1); } |
+	translation_unit external_declaration { $1->children.push_back($2); $$ = $1; }
 ;
 
 external_declaration:
-	function_definition |
-	declaration
+	function_definition { $$ = new ExternalDeclarationNode($1); } |
+	declaration { $$ = new ExternalDeclarationNode($1); }
 ;
 
 function_definition:
-	declaration_specifiers declarator declaration_list compound_statement|
-	declaration_specifiers declarator compound_statement
+	declaration_specifiers declarator declaration_list compound_statement { $$ = new FunctionDeclarationNode($1, $2, $3, $4); } |
+	declaration_specifiers declarator compound_statement { $$ = new FunctionDeclarationNode($1, $2, $3); }
 ;
 
 declaration_list: 
-    declaration
-  | declaration_list declaration
+    declaration { $$ = new DeclarationList($1); }
+  | declaration_list declaration { $1->children.push_back($2); $$ = $1; }
 ;
 
 identifier_list:
-    IDENTIFIER
-  | identifier_list COMMA IDENTIFIER
+    IDENTIFIER { $$ = new IdentifierList($1); }
+  | identifier_list COMMA IDENTIFIER { $1->children.push_back($3); $$ = $1; }
 ;
 
 %%
