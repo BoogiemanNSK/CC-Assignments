@@ -712,43 +712,43 @@ class DirectDeclaratorListNode: public Node
 // Tokens
 
 // Keywords
-%token AUTO
-%token BOOL
-%token BREAK
-%token CASE
-%token CHAR
-%token COMPLEX
-%token CONST
-%token CONTINUE
-%token DEFAULT
-%token DO
-%token DOUBLE
-%token ELSE
-%token ENUM
-%token EXTERN
-%token FLOAT
-%token FOR
-%token GOTO
-%token IF
-%token IMAGINARY
-%token INLINE
-%token INT
-%token LONG
-%token REGISTER
-%token RESTRICT
-%token RETURN
-%token SHORT
-%token SIGNED
-%token SIZEOF
-%token STATIC
-%token STRUCT
-%token SWITCH
-%token TYPEDEF
-%token UNION
-%token UNSIGNED
-%token VOID
-%token VOLATILE
-%token WHILE
+%token  <std::string>  AUTO
+%token  <std::string>  BOOL
+%token  <std::string>  BREAK
+%token  <std::string>  CASE
+%token  <std::string>  CHAR
+%token  <std::string>  COMPLEX
+%token  <std::string>  CONST
+%token  <std::string>  CONTINUE
+%token  <std::string>  DEFAULT
+%token  <std::string>  DO
+%token  <std::string>  DOUBLE
+%token  <std::string>  ELSE
+%token  <std::string>  ENUM
+%token  <std::string>  EXTERN
+%token  <std::string>  FLOAT
+%token  <std::string>  FOR
+%token  <std::string>  GOTO
+%token  <std::string>  IF
+%token  <std::string>  IMAGINARY
+%token  <std::string>  INLINE
+%token  <std::string>  INT
+%token  <std::string>  LONG
+%token  <std::string>  REGISTER
+%token  <std::string>  RESTRICT
+%token  <std::string>  RETURN
+%token  <std::string>  SHORT
+%token  <std::string>  SIGNED
+%token  <std::string>  SIZEOF
+%token  <std::string>  STATIC
+%token  <std::string>  STRUCT
+%token  <std::string>  SWITCH
+%token  <std::string>  TYPEDEF
+%token  <std::string>  UNION
+%token  <std::string>  UNSIGNED
+%token  <std::string>  VOID
+%token  <std::string>  VOLATILE
+%token  <std::string>  WHILE
 
 %token <std::string> IDENTIFIER
 
@@ -786,60 +786,60 @@ class DirectDeclaratorListNode: public Node
 
 // Delimeters
 
-%token SEMICOLON ";"
-%token COMMA ","
-%token COLON ":"
-%token LEFT_PAR "("
-%token RIGHT_PAR ")"
-%token DOT "."
-%token LEFT_CBRACKET "{"
-%token RIGHT_CBRACKET "}"
-%token LEFT_BRACKET "["
-%token RIGHT_BRACKET "]"
+%token  <std::string>  SEMICOLON ";"
+%token  <std::string>  COMMA ","
+%token  <std::string>  COLON ":"
+%token  <std::string>  LEFT_PAR "("
+%token  <std::string>  RIGHT_PAR ")"
+%token  <std::string>  DOT "."
+%token  <std::string>  LEFT_CBRACKET "{"
+%token  <std::string>  RIGHT_CBRACKET "}"
+%token  <std::string>  LEFT_BRACKET "["
+%token  <std::string>  RIGHT_BRACKET "]"
 
 // Operators
 
-%token ASSIGN_OP "="
-%token AMP "&"
-%token LOG_NOT_OP "!"
-%token BIN_NOT_OP "~"
-%token MINUS "-"
-%token PLUS "+"
-%token STAR "*"
-%token SLASH "/"
-%token MOD_OP "%"
-%token G_OP "<"
-%token L_OP ">"
-%token BIN_XOR_OP "^"
-%token BIN_OR_OP "|"
-%token TERNARY_OP "?"
+%token  <std::string>  ASSIGN_OP "="
+%token  <std::string>  AMP "&"
+%token  <std::string>  LOG_NOT_OP "!"
+%token  <std::string>  BIN_NOT_OP "~"
+%token  <std::string>  MINUS "-"
+%token  <std::string>  PLUS "+"
+%token  <std::string>  STAR "*"
+%token  <std::string>  SLASH "/"
+%token  <std::string>  MOD_OP "%"
+%token  <std::string>  G_OP "<"
+%token  <std::string>  L_OP ">"
+%token  <std::string>  BIN_XOR_OP "^"
+%token  <std::string>  BIN_OR_OP "|"
+%token  <std::string>  TERNARY_OP "?"
 
 
-%token ELLIPSIS "..."
-%token RIGHT_ASSIGN ">>="
-%token LEFT_ASSIGN "<<="
-%token ADD_ASSIGN "+="
-%token SUB_ASSIGN "-="
-%token MUL_ASSIGN "*="
-%token DIV_ASSIGN "/="
-%token MOD_ASSIGN "%="
-%token AND_ASSIGN "&="
-%token XOR_ASSIGN "^="
-%token OR_ASSIGN "|="
-%token RIGHT_OP ">>"
-%token LEFT_OP "<<"
-%token INC_OP "++"
-%token DEC_OP "--"
-%token PTR_OP "->"
-%token AND_OP "&&"
-%token OR_OP "||"
-%token LE_OP "<="
-%token GE_OP ">="
-%token EQ_OP "=="
-%token NE_OP "!="
+%token  <std::string>  ELLIPSIS "..."
+%token  <std::string>  RIGHT_ASSIGN ">>="
+%token  <std::string>  LEFT_ASSIGN "<<="
+%token  <std::string>  ADD_ASSIGN "+="
+%token  <std::string>  SUB_ASSIGN "-="
+%token  <std::string>  MUL_ASSIGN "*="
+%token  <std::string>  DIV_ASSIGN "/="
+%token  <std::string>  MOD_ASSIGN "%="
+%token  <std::string>  AND_ASSIGN "&="
+%token  <std::string>  XOR_ASSIGN "^="
+%token  <std::string>  OR_ASSIGN "|="
+%token  <std::string>  RIGHT_OP ">>"
+%token  <std::string>  LEFT_OP "<<"
+%token  <std::string>  INC_OP "++"
+%token  <std::string>  DEC_OP "--"
+%token  <std::string>  PTR_OP "->"
+%token  <std::string>  AND_OP "&&"
+%token  <std::string>  OR_OP "||"
+%token  <std::string>  LE_OP "<="
+%token  <std::string>  GE_OP ">="
+%token  <std::string>  EQ_OP "=="
+%token  <std::string>  NE_OP "!="
 
-// %start translation_unit
-%start primary_expression
+%start translation_unit
+// %start primary_expression
 
 // Grammar
 %%
@@ -928,11 +928,11 @@ postfix_expression:
     | postfix_expression LEFT_PAR argument_expression_list RIGHT_PAR
     | postfix_expression LEFT_PAR RIGHT_PAR{$$ = $1;}
     | postfix_expression DOT IDENTIFIER {$1->children.push_back(new IdentifierNode($3)); $$ = $1 ;}
-    | postfix_expression PTR_OP IDENTIFIER{$1 -> children.push_pack(new OperatorNode($2));$1->children.push_back(new IdentifierNode($3)); $$=$1;}
-    | postfix_expression INC_OP{$1 -> children.push_pack(new OperatorNode($2));$1->children.push_back(new IdentifierNode($3)); $$=$1;}
-    | postfix_expression DEC_OP{$1 -> children.push_pack(new OperatorNode($2));$1->children.push_back(new IdentifierNode($3)); $$=$1;}
-    | LEFT_PAR type_name RIGHT_PAR LEFT_CBRACKET initializer_list RIGHT_CBRACKET{ $$ = new PostfixExpressionNode($2,$5);}
-    | LEFT_PAR type_name RIGHT_PAR LEFT_CBRACKET initializer_list COMMA RIGHT_CBRACKET{$$= new PostfixExpressionNode($2,$5);}
+    | postfix_expression PTR_OP IDENTIFIER {$1 -> children.push_pack(new OperatorNode( $2 ));$1->children.push_back(new IdentifierNode($3)); $$=$1;}
+    | postfix_expression INC_OP {$1 -> children.push_pack(new OperatorNode($2)); $$=$1;}
+    | postfix_expression DEC_OP {$1 -> children.push_pack(new OperatorNode($2)); $$=$1;}
+    | LEFT_PAR type_name RIGHT_PAR LEFT_CBRACKET initializer_list RIGHT_CBRACKET { $$ = new PostfixExpressionNode($2,$5);}
+    | LEFT_PAR type_name RIGHT_PAR LEFT_CBRACKET initializer_list COMMA RIGHT_CBRACKET {$$= new PostfixExpressionNode($2,$5);}
 ;
 
 argument_expression_list:
@@ -1050,10 +1050,6 @@ expression:
     | expression COMMA assignment_expression {$1->children.push_back($3); $$ = $1 ;}
 ;
 
-conditional_expression: 
-    logical_or_expression {$$ = new ConditionalExpressionNode($1);}
-	| logical_or_expression TERNARY_OP expression COLON conditional_expression {$$ = new ConditionalExpressionNode($1, $3, $5); ;}
-;
 
 constant_expression:
     conditional_expression {$$ = new ConstantExpressionNode($1);}
@@ -1134,8 +1130,8 @@ direct_declarator:
     IDENTIFIER {$$ = new DirectDeclaratorNode(new IdentifierNode($1));}|
 	LEFT_PAR declarator RIGHT_PAR{$$ = new DirectDeclaratorNode($2);} |
 	direct_declarator LEFT_BRACKET type_qualifier_list assignment_expression RIGHT_BRACKET{$1->children.push_back($3);$1->children.push_back($4); $$ = $1 ;} |
-	direct_declarator LEFT_BRACKET type_qualifier_list RIGHT_BRACKET {$1->children.push_back($3);$ $$ = $1 ;}|
-	direct_declarator LEFT_BRACKET assignment_expression RIGHT_BRACKET {$1->children.push_back($3);$ $$ = $1 ;}|
+	direct_declarator LEFT_BRACKET type_qualifier_list RIGHT_BRACKET {$1->children.push_back($3); $$ = $1 ;}|
+	direct_declarator LEFT_BRACKET assignment_expression RIGHT_BRACKET {$1->children.push_back($3); $$ = $1 ;}|
 	direct_declarator LEFT_BRACKET STATIC type_qualifier_list assignment_expression RIGHT_BRACKET{$1->children.push_back("static"); $1->children.push_back($4);$1->children.push_back($5); $$ = $1 ;} |
 	direct_declarator LEFT_BRACKET type_qualifier_list STATIC assignment_expression RIGHT_BRACKET{$1->children.push_back($3); $1->children.push_back("static");$1->children.push_back($5); $$ = $1 ;} |
 	direct_declarator LEFT_BRACKET type_qualifier_list STAR RIGHT_BRACKET {$1->children.push_back($3); $$ = $1 ;}|
