@@ -73,30 +73,30 @@ ANYCHAR?'(\\.|[^\\'\n])+' 	{ fprintf(yyout, "LITERAL %s\n", yytext); }
 
 \"(\\.|[^"\\])*\"	{ fprintf(yyout, "STRING_LITERAL %s\n", yytext); }
 
-";"				{ fprintf(yyout, "%s\n", yytext); }
-","				{ fprintf(yyout, "%s\n", yytext); }
-":"				{ fprintf(yyout, "%s\n", yytext); }
-"="				{ fprintf(yyout, "%s\n", yytext); }
-"("				{ fprintf(yyout, "%s\n", yytext); }
-")"				{ fprintf(yyout, "%s\n", yytext); }
-"."				{ fprintf(yyout, "%s\n", yytext); }
-"&"				{ fprintf(yyout, "%s\n", yytext); }
-"!"				{ fprintf(yyout, "%s\n", yytext); }
-"~"				{ fprintf(yyout, "%s\n", yytext); }
-"-"				{ fprintf(yyout, "%s\n", yytext); }
-"+"				{ fprintf(yyout, "%s\n", yytext); }
-"*"				{ fprintf(yyout, "%s\n", yytext); }
-"/"				{ fprintf(yyout, "%s\n", yytext); }
-"%"				{ fprintf(yyout, "%s\n", yytext); }
-"<"				{ fprintf(yyout, "%s\n", yytext); }
-">"				{ fprintf(yyout, "%s\n", yytext); }
-"^"				{ fprintf(yyout, "%s\n", yytext); }
-"|"				{ fprintf(yyout, "%s\n", yytext); }
-"?"				{ fprintf(yyout, "%s\n", yytext); }
-("{"|"<%")		{ fprintf(yyout, "{\n"); }
-("}"|"%>")		{ fprintf(yyout, "}\n"); }
-("["|"<:")		{ fprintf(yyout, "[\n"); }
-("]"|":>")		{ fprintf(yyout, "]\n"); }
+";"				{ fprintf(yyout, "SEMICOLON\n"); }
+","				{ fprintf(yyout, "COMMA\n"); }
+":"				{ fprintf(yyout, "COLON\n"); }
+"="				{ fprintf(yyout, "ASSIGN_OP\n"); }
+"("				{ fprintf(yyout, "LEFT_PAR\n"); }
+")"				{ fprintf(yyout, "RIGHT_PAR\n"); }
+"."				{ fprintf(yyout, "DOT\n"); }
+"&"				{ fprintf(yyout, "AMP\n"); }
+"!"				{ fprintf(yyout, "LOG_NOT_OP\n"); }
+"~"				{ fprintf(yyout, "BIN_NOT_OP\n"); }
+"-"				{ fprintf(yyout, "MINUS\n"); }
+"+"				{ fprintf(yyout, "PLUS\n"); }
+"*"				{ fprintf(yyout, "STAR\n"); }
+"/"				{ fprintf(yyout, "BACK_SLASH\n"); }
+"%"				{ fprintf(yyout, "MOD_OP\n"); }
+"<"				{ fprintf(yyout, "G_OP\n"); }
+">"				{ fprintf(yyout, "L_OP\n"); }
+"^"				{ fprintf(yyout, "BIN_XOR_OP\n"); }
+"|"				{ fprintf(yyout, "BIN_OR_OP\n"); }
+"?"				{ fprintf(yyout, "TERNARY_OP\n"); }
+("{"|"<%")		{ fprintf(yyout, "LEFT_CBRACKET\n"); }
+("}"|"%>")		{ fprintf(yyout, "RIGHT_CBRACKET\n"); }
+("["|"<:")		{ fprintf(yyout, "LEFT_BRACKET\n"); }
+("]"|":>")		{ fprintf(yyout, "RIGHT_BRACKET\n"); }
 "..."			{ fprintf(yyout, "ELLIPSIS\n"); }
 ">>="			{ fprintf(yyout, "RIGHT_ASSIGN\n"); }
 "<<="			{ fprintf(yyout, "LEFT_ASSIGN\n"); }

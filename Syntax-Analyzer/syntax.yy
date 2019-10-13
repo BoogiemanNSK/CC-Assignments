@@ -27,10 +27,11 @@
             }
 
             void print_tree(){
-                cout << name;
+                cout << this << "_" << name;
                 for (int i = 0;i<children.size();i++){
-                    cout << " " << children[i]->print();
+                    cout << " " << children[i] << "_" << children[i]->print();
                 }
+                cout << endl;
             }
 
             virtual string print() = 0;
@@ -544,28 +545,59 @@ class DirectDeclaratorList: public Node
 // %token ~
 // %token |
 
-%token ELLIPSIS
-%token RIGHT_ASSIGN
-%token LEFT_ASSIGN
-%token ADD_ASSIGN
-%token SUB_ASSIGN
-%token MUL_ASSIGN
-%token DIV_ASSIGN
-%token MOD_ASSIGN
-%token AND_ASSIGN
-%token XOR_ASSIGN
-%token OR_ASSIGN
-%token RIGHT_OP
-%token LEFT_OP
-%token INC_OP
-%token DEC_OP
-%token PTR_OP
-%token AND_OP
-%token OR_OP
-%token LE_OP
-%token GE_OP
-%token EQ_OP
-%token NE_OP
+// Delimeters
+
+%token SEMICOLON ";"
+%token COMMA ","
+%token COLON ":"
+%token LEFT_PAR "("
+%token RIGHT_PAR ")"
+%token DOT "."
+%token LEFT_CBRACKET "{"
+%token RIGHT_CBRACKET "}"
+%token LEFT_BRACKET "["
+%token RIGHT_BRACKET "]"
+
+// Operators
+
+%token ASSIGN_OP "="
+%token AMP "&"
+%token LOG_NOT_OP "!"
+%token BIN_NOT_OP "~"
+%token MINUS "-"
+%token PLUS "+"
+%token STAR "*"
+%token BACK_SLASH "/"
+%token MOD_OP "%"
+%token G_OP "<"
+%token L_OP ">"
+%token BIN_XOR_OP "^"
+%token BIN_OR_OP "|"
+%token TERNARY_OP "?"
+
+
+%token ELLIPSIS "..."
+%token RIGHT_ASSIGN ">>="
+%token LEFT_ASSIGN "<<="
+%token ADD_ASSIGN "+="
+%token SUB_ASSIGN "-="
+%token MUL_ASSIGN "*="
+%token DIV_ASSIGN "/="
+%token MOD_ASSIGN "%="
+%token AND_ASSIGN "&="
+%token XOR_ASSIGN "^="
+%token OR_ASSIGN "|="
+%token RIGHT_OP ">>"
+%token LEFT_OP "<<"
+%token INC_OP "++"
+%token DEC_OP "--"
+%token PTR_OP "->"
+%token AND_OP "&&"
+%token OR_OP "||"
+%token LE_OP "<="
+%token GE_OP ">="
+%token EQ_OP "=="
+%token NE_OP "!="
 
 // %start translation_unit
 %start primary_expression
@@ -785,7 +817,7 @@ conditional_expression:
 ;
 
 constant_expression:
-    conditional_expression($$ = new ConstantExpressionNode($1);)
+    conditional_expression {$$ = new ConstantExpressionNode($1);}
 ;
 
 declaration:
@@ -795,7 +827,7 @@ declaration:
 
 declaration_specifiers: 
     storage_class_specifier {$$ = new DeclarationSpecifierNode($1); }|
-	storage_class_specifier declaration_specifiers {{$$ = new DeclarationSpecifierNode($1, $2);}|
+	storage_class_specifier declaration_specifiers {$$ = new DeclarationSpecifierNode($1, $2);}|
 	type_specifier {$$ = new DeclarationSpecifierNode($1); } |
 	type_specifier declaration_specifiers { $$ = new DeclarationSpecifierNode($1,$2); }|
 	type_qualifier {$$ = new TypeQualifierNode($1);} |
