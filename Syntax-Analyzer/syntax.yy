@@ -1,12 +1,11 @@
 %language "c++"
 
-%code top{
+%code top {
     #include <vector>
     #include <string>
     #include <iostream> 
     #include "syntax.tab.cc"
     #include "stack.hh"
-
 
     using namespace std;
 
@@ -16,19 +15,19 @@
             Node* parent;
             string name;
             
-            Node(vector<Node*> _children, Node* _parent){
+            Node(vector<Node*> _children, Node* _parent) {
                 children = _children;
                 parent = _parent;
             }
             
-            Node(){
+            Node() {
                 children = vector<Node*>(1);
                 parent = NULL;
             }
 
-            void print_tree(){
+            void print_tree() {
                 cout << this << "_" << name;
-                for (int i = 0;i<children.size();i++){
+                for (int i = 0; i < children.size(); i++) {
                     cout << " " << children[i] << "_" << children[i]->print();
                 }
                 cout << endl;
@@ -39,52 +38,50 @@
 
     class PrimaryExpressionNode : public Node {
         public:
-            string print(){
+            string print() {
                 return("PrimaryExpressionNode");
             }
 
-            PrimaryExpressionNode(Node* expr){
+            PrimaryExpressionNode(Node* expr) {
                 children = {expr};
             }
     };
 
-    
-    class IdentifierNode : public Node{
+    class IdentifierNode : public Node {
         public:
             string ident;
 
-            string print(){
+            string print() {
                 return("IDENT(" + ident + ")");
-            };
+            }
 
-            IdentifierNode(string _ident){
+            IdentifierNode(string _ident) {
                 ident = _ident;
             }
     };
 
-    class NumericLiteralNode : public Node{
+    class NumericLiteralNode : public Node {
         public:
             string num;
 
-            string print(){
+            string print() {
                 return("NUMLITERAL(" + num + ")");
-            };
+            }
 
-            NumericLiteralNode(string _num){
+            NumericLiteralNode(string _num) {
                 num = _num;
             }
     };
 
-
-    class StrLiteralNode : public Node{
+    class StrLiteralNode : public Node {
         public:
             string val;
 
-            string print(){
+            string print() {
                 return("STRLITERAL(" + val + ")");
             }
 
-            StrLiteralNode(string _val){
+            StrLiteralNode(string _val) {
                 val = _val;
             }
     };
@@ -117,7 +114,7 @@
             string _exprType;
 
             string print() {
-                string res = _exprType + "(" children[0].preint();
+                string res = _exprType + "(" + children[0].print();
                 for (int i = 0; i < ops.size(); i++) {
                     res += (" " + ops[i] + " ");
                     res += children[i + 1];
@@ -130,6 +127,7 @@
                 children = vector<Node*>{node};
                 ops = vector<string>();
             }
+
             MultiplicativeExpressionNode(Node* node, Node* n2) {
                 children = vector<Node*>{node,n2};
                 ops = vector<string>();
@@ -148,6 +146,7 @@
                 _sign = sign;
             }
     }
+
     class KeywordNode : public Node {
         public:
             string _sign;
@@ -161,38 +160,36 @@
             }
     }
 
-
-    class PostfixExpressionNode : public Node{
+    class PostfixExpressionNode : public Node {
         public:
-            string print(){
-                return("PostfixExpressionNode")
+            string print() {
+                return("PostfixExpressionNode");
             }
 
-        PostfixExpressionNode(Node* n1){
-                                         children = vector<Node*>{n1};
-
-                                     }
-        PostfixExpressionNode(Node* n1, Node* n2){
-                                         children = vector<Node*>{n1,n2};
-
-                                     }
-    }
-
-    class ArgumentExpressionListNode: public Node{
-        public:
-            string print(){
-                return("ArgumentExpressionList")
+            PostfixExpressionNode(Node* n1) {
+                children = vector<Node*>{n1};
             }
 
-         ArgumentExpressionList(Node* n1){
-            children = vector<Node*>{n1};
-
-        }
+            PostfixExpressionNode(Node* n1, Node* n2) {
+                children = vector<Node*>{n1, n2};
+            }
     }
-    class ExpressionNode: public Node{
+
+    class ArgumentExpressionListNode: public Node {
+        public:
+            string print() {
+                return("ArgumentExpressionList");
+            }
+
+            ArgumentExpressionList(Node* n1) {
+                children = vector<Node*>{n1};
+            }
+    }
+
+    class ExpressionNode: public Node {
         public:
             string print(){
-                return("ExpressionNode")
+                return("ExpressionNode");
             }
 
          ExpressionNode(Node* n1){
@@ -203,7 +200,7 @@
     class UnaryExpressionNode : public Node{
         public:
             string print(){
-                return("UnaryExpressionNode")
+                return("UnaryExpressionNode");
             }
 
           UnaryExpressionNode(Node* n1){
@@ -215,7 +212,7 @@
     class  UnaryOperatorNode: public Node{
         public:
             string print(){
-                return("UnaryOperatorNode")
+                return("UnaryOperatorNode");
             }
 
           UnaryOperatorNode(Node* n1){
@@ -231,7 +228,7 @@
         public:
 
             string print(){
-                return("ConditionalExpressionNode")
+                return("ConditionalExpressionNode");
             }
         ConditionalExpressionNode(Node* n1){
             children = vector<Node*>{n1};
@@ -246,7 +243,7 @@
         public:
 
             string print(){
-                return("AssignmentExpressionNode")
+                return("AssignmentExpressionNode");
             }
         AssignmentExpressionNode(Node* n1){
             children = vector<Node*>{n1};
@@ -260,7 +257,7 @@
     class ConstantExpressionNode: public Node{
         public:
             string print(){
-                return("ConstantExpressionNode")
+                return("ConstantExpressionNode");
             }
 
          ConstantExpressionNode(Node* n1){
@@ -272,7 +269,7 @@
     class DeclarationNode: public Node{
             public:
             string print(){
-                return("DeclarationNode")
+                return("DeclarationNode");
             }
 
          DeclarationNode(Node* n1){
@@ -288,7 +285,7 @@
     class DeclarationSpecifiersNode: public Node{
             public:
             string print(){
-                return("DeclarationSpecifiersNode")
+                return("DeclarationSpecifiersNode");
             }
 
          DeclarationSpecifiersNode(Node* n1){
@@ -304,7 +301,7 @@
     class FunctionSpecifierNode:public Node{
             public:
             string print(){
-                return("FunctionSpecifierNode")
+                return("FunctionSpecifierNode");
             }
 
         FunctionSpecifierNode(Node* n1){
@@ -315,7 +312,7 @@
         class TypeSpecifierNode:public Node{
             public:
             string print(){
-                return("TypeSpecifierNode")
+                return("TypeSpecifierNode");
             }
 
         TypeSpecifierNode(Node* n1){
@@ -326,7 +323,7 @@
     class StructOrUnionSpecifierNode: public Node{
             public:
             string print(){
-                return("StructOrUnionSpecifierNode")
+                return("StructOrUnionSpecifierNode");
             }
 
         StructOrUnionSpecifierNode(Node* n1,Node* n2, Node* n3){
@@ -342,7 +339,7 @@
     class  StructDeclarationListNode: public Node{
             public:
             string print(){
-                return("StructDeclarationListNode")
+                return("StructDeclarationListNode");
             }
 
         StructDeclarationListNode(Node* n1){
@@ -357,7 +354,7 @@
     class  StructDeclarationNode: public Node{
             public:
             string print(){
-                return("StructDeclarationNode")
+                return("StructDeclarationNode");
             }
 
         StructDeclarationNode(Node* n1){
@@ -373,7 +370,7 @@
     class StructDeclaratorListNode: public Node{
             public:
             string print(){
-                return("StructDeclaratorListNode")
+                return("StructDeclaratorListNode");
             }
 
         StructDeclaratorListNode(Node* n1){
@@ -388,7 +385,7 @@
         class StructDeclaratorNode: public Node{
             public:
             string print(){
-                return("StructDeclaratorNode")
+                return("StructDeclaratorNode");
             }
 
         StructDeclaratorNode(Node* n1){
@@ -400,41 +397,42 @@
 
         }
     }
-    class SpecifierQualifierListNode:ublic Node{
-            public:
-            string print(){
-                return("SpecifierQualifierListNode")
-            }
 
-         SpecifierQualifierListNode(Node* n1){
-            children = vector<Node*>{n1};
-
+    class SpecifierQualifierListNode : public Node {
+    public:
+        string print() {
+            return("SpecifierQualifierListNode");
         }
-         SpecifierQualifierListNode(Node* n1,Node* n2){
-            children = vector<Node*>{n1,n2};
 
+        SpecifierQualifierListNode(Node* n1) {
+            children = vector<Node*>{n1};
+        }
+
+        SpecifierQualifierListNode(Node* n1,Node* n2) {
+            children = vector<Node*>{n1, n2};
         }
     }
 
-    class EnumSpecifierNode :  public Node {
-            string print(){
-                return("EnumSpecifierNode")
-            }
-
-        EnumSpecifierNode(Node* n1, Node* n2, Node* n3){
-            children = vector<Node*>{n1,n2,n3};
-
+    class EnumSpecifierNode : public Node {
+    public:
+        string print() {
+            return("EnumSpecifierNode");
         }
-         EnumSpecifierNode(Node* n1,Node* n2){
-            children = vector<Node*>{n1,n2};
 
+        EnumSpecifierNode(Node* n1, Node* n2, Node* n3) {
+            children = vector<Node*>{n1, n2, n3};
+        }
+
+        EnumSpecifierNode(Node* n1, Node* n2) {
+            children = vector<Node*>{n1, n2};
         }
     }
 
     class EnumeratorNode: public Node {
-            string print(){
-                return("EnumeratorNode")
-            }
+    public:
+        string print() {
+            return("EnumeratorNode");
+        }
 
          EnumeratorNode(Node* n1){
             children = vector<Node*>{n1};
@@ -447,7 +445,7 @@
     }
     class TypeNameNode: public Node {
             string print(){
-                return("TypeNameNode")
+                return("TypeNameNode");
             }
 
          TypeNameNode(Node* n1){
@@ -461,7 +459,7 @@
     }
     class AbstractDeclaratorNode :  public Node {
             string print(){
-                return("AbstractDeclaratorNode")
+                return("AbstractDeclaratorNode");
             }
 
         AbstractDeclaratorNode(Node* n1){
@@ -474,9 +472,24 @@
         }
     }
 
+    class DirectAbstractDeclaratorNode : public Node {
+        public:
+            string print() {
+                return("DirectAbstractDeclaratorNode");
+            }
+
+            DirectAbstractDeclaratorNode(Node* n1) {
+                children = vector<Node*>{n1};
+            }
+
+            DirectAbstractDeclaratorNode(Node* n1,Node* n2) {
+                children = vector<Node*>{n1, n2};
+            }
+    }
+
     class  EnumeratorListNode :public Node {
             string print(){
-                return("EnumeratorListNode")
+                return("EnumeratorListNode");
             }
 
         EnumeratorListNode(Node* n1){
@@ -486,7 +499,7 @@
     class InitDeclaratorListNodeNode: public Node{
             public:
             string print(){
-                return("InitDeclaratorListNode")
+                return("InitDeclaratorListNode");
             }
 
         InitDeclaratorListNode(Node* n1){
@@ -502,7 +515,7 @@
     class StorageClassSpecifierNode: public Node{
         public:
             string print(){
-                return("StorageClassSpecifierNode")
+                return("StorageClassSpecifierNode");
             }
 
          StorageClassSpecifierNode(Node* n1){
@@ -514,7 +527,7 @@
     class InitDeclaratorNode :public Node{
         public:
             string print(){
-                return("InitDeclaratorNode")
+                return("InitDeclaratorNode");
             }
 
         InitDeclaratorNode(Node* n1){
@@ -530,7 +543,7 @@
     class InitializerNode : public Node{
         public:
             string print(){
-                return("InitializerNode")
+                return("InitializerNode");
             }
 
          InitializerNode(Node* n1){
@@ -541,7 +554,7 @@
     class InitializerListNode : public Node{
         public:
             string print(){
-                return("InitializerListNode")
+                return("InitializerListNode");
             }
 
          InitializerListNode(Node* n1){
@@ -553,7 +566,7 @@
     class DesignatorNode: public Node{
         public:
             string print(){
-                return("DesignatorNode")
+                return("DesignatorNode");
             }
 
          DesignatorNode(Node* n1){
@@ -564,7 +577,7 @@
     class DesignatorListNode: public Node{
         public:
             string print(){
-                return("DesignatorNode")
+                return("DesignatorNode");
             }
 
          DesignatorListNode(Node* n1){
@@ -579,7 +592,7 @@
     class DesignationNode: public Node{
         public:
             string print(){
-                return("DesignationNode")
+                return("DesignationNode");
             }
 
          DesignationNode(Node* n1){
@@ -590,7 +603,7 @@
     class DeclaratorNode: public Node{
         public:
             string print(){
-                return("DeclaratorNode")
+                return("DeclaratorNode");
             }
 
          DeclaratorNode(Node* n1){
@@ -607,7 +620,7 @@
     {
         public:
             string print(){
-                return("PointerNode")
+                return("PointerNode");
             }
 
         PointerNode(Node* n1){
@@ -625,7 +638,7 @@ class DirectDeclaratorListNode: public Node
     {
         public:
             string print(){
-                return("DirectDeclaratorList")
+                return("DirectDeclaratorList");
             }
 
        DirectDeclaratorListNode(Node* n1){
@@ -644,7 +657,7 @@ class DirectDeclaratorListNode: public Node
     class TypeQualifierListNode :  public Node{
         public:
             string print(){
-                return("TypeQualifieListNode")
+                return("TypeQualifieListNode");
             }
 
          TypeQualifierListNode(){
@@ -655,7 +668,7 @@ class DirectDeclaratorListNode: public Node
     class TypeQualifierNode : public Node{
         public:
             string print(){
-                return("TypeQualifierNode")
+                return("TypeQualifierNode");
             }
 
         TypeQualifierNode(Node* n1){
@@ -667,7 +680,7 @@ class DirectDeclaratorListNode: public Node
     class ParameterClassList:public Node{
         public:
             string print(){
-                return(" ParameterClassList")
+                return(" ParameterClassList");
             }
 
          ParameterClassList(Node* n2, Node* n1){
@@ -683,7 +696,7 @@ class DirectDeclaratorListNode: public Node
     class  ParameterListNode : public Node{
         public:
             string print(){
-                return("ParameterListNode")
+                return("ParameterListNode");
             }
 
        ParameterListNode(Node* n1){
@@ -691,10 +704,11 @@ class DirectDeclaratorListNode: public Node
 
         }
     }
+
     class ParameterDeclarationNode : public Node{
         public:
             string print(){
-                return("ParameterDeclarationList")
+                return("ParameterDeclarationList");
             }
 
        ParameterDeclarationNode(Node* n1){
@@ -1251,27 +1265,27 @@ type_name:
 ;
 
 abstract_declarator:
-	pointer{$$ = new AbstractDeclaratorNode($1);} |
+	pointer {$$ = new AbstractDeclaratorNode($1);} |
 	direct_abstract_declarator {$$ = new AbstractDeclaratorNode($1);}|
-	pointer direct_abstract_declarator  {$$ = new AbstractDeclaratorNode($1,$2);}
+	pointer direct_abstract_declarator {$$ = new AbstractDeclaratorNode($1,$2);}
 ;
 
 direct_abstract_declarator:
-	LEFT_PAR abstract_declarator RIGHT_PAR{$$ = new DirectAbstractDeclaratorNode($2);} |
-	LEFT_BRACKET RIGHT_BRACKET {$$ = new DirectAbstractDeclaratorNode();}|
-	LEFT_BRACKET assignment_expression RIGHT_BRACKET {$$ = new DirectAbstractDeclaratorNode($2);} |
-	direct_abstract_declarator LEFT_BRACKET RIGHT_BRACKET  |
-	direct_abstract_declarator LEFT_BRACKET assignment_expression RIGHT_BRACKET|
-	LEFT_BRACKET STAR RIGHT_BRACKET |
-	direct_abstract_declarator LEFT_BRACKET STAR RIGHT_BRACKET |
-	LEFT_PAR RIGHT_PAR |
-	LEFT_PAR parameter_type_list RIGHT_PAR |
-	direct_abstract_declarator LEFT_PAR RIGHT_PAR |
-	direct_abstract_declarator LEFT_PAR parameter_type_list RIGHT_PAR 
+	LEFT_PAR abstract_declarator RIGHT_PAR { $$ = new DirectAbstractDeclaratorNode($2); } |
+	LEFT_BRACKET RIGHT_BRACKET { $$ = new DirectAbstractDeclaratorNode(); }|
+	LEFT_BRACKET assignment_expression RIGHT_BRACKET { $$ = new DirectAbstractDeclaratorNode($2); } |
+	direct_abstract_declarator LEFT_BRACKET RIGHT_BRACKET { $1->children.push_back(new DirectAbstractDeclaratorNode()); } |
+	direct_abstract_declarator LEFT_BRACKET assignment_expression RIGHT_BRACKET { $1->children.push_back(new DirectAbstractDeclaratorNode($3)); } |
+	LEFT_BRACKET STAR RIGHT_BRACKET { $$ = new DirectAbstractDeclaratorNode(); } |
+	direct_abstract_declarator LEFT_BRACKET STAR RIGHT_BRACKET { $1->children.push_back(new DirectAbstractDeclaratorNode()); } |
+	LEFT_PAR RIGHT_PAR { $$ = new DirectAbstractDeclaratorNode(); } |
+	LEFT_PAR parameter_type_list RIGHT_PAR { $$ = new DirectAbstractDeclaratorNode($2); } |
+	direct_abstract_declarator LEFT_PAR RIGHT_PAR { $1->children.push_back(new DirectAbstractDeclaratorNode()); } |
+	direct_abstract_declarator LEFT_PAR parameter_type_list RIGHT_PAR { $1->children.push_back(new DirectAbstractDeclaratorNode($3)); }
 ;
 
 statement:
-	labeled_statement |
+	labeled_statement {} |
 	compound_statement |
 	expression_statement |
 	selection_statement | 
