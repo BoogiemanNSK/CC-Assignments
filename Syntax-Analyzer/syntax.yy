@@ -94,7 +94,7 @@
             string print() {
                 string prefix = typeName.size() > 0 ? typeName + "_CAST(" : "";
                 string suffix = typeName.size() > 0 ? ")" : "";
-                return(prefix + node.print() + suffix);
+                return(prefix + node->print() + suffix);
             }
 
             CastExpressionNode(Node* node) {
@@ -106,7 +106,7 @@
                 CastExpressionNode::node = node;
                 CastExpressionNode::typeName = typeName;
             }
-    }
+    };
 
     class BinaryExpressionNode : public Node {
         public:
@@ -114,51 +114,51 @@
             string _exprType;
 
             string print() {
-                string res = _exprType + "(" + children[0].print();
+                string res = _exprType + "(" + children[0]->print();
                 for (int i = 0; i < ops.size(); i++) {
                     res += (" " + ops[i] + " ");
-                    res += children[i + 1];
+                    res += children[i + 1]->print();
                 }
                 res += ")";
                 return res;
             }
 
-            MultiplicativeExpressionNode(Node* node) {
+            BinaryExpressionNode(Node* node) {
                 children = vector<Node*>{node};
                 ops = vector<string>();
             }
 
-            MultiplicativeExpressionNode(Node* node, Node* n2) {
+            BinaryExpressionNode(Node* node, Node* n2) {
                 children = vector<Node*>{node,n2};
                 ops = vector<string>();
             }
-    }
+    };
 
     class OperatorNode : public Node {
         public:
             string _sign;
 
-            public string print() {
+             string print() {
                 return("OPERATOR(" + _sign + ")");
             } 
 
             OperatorNode(string sign) {
                 _sign = sign;
             }
-    }
+    };
 
     class KeywordNode : public Node {
         public:
             string _sign;
 
-            public string print() {
+            string print() {
                 return("Keyword(" + _sign + ")");
             } 
 
             KeywordNode(string sign) {
                 _sign = sign;
             }
-    }
+    };
 
     class PostfixExpressionNode : public Node {
         public:
@@ -173,7 +173,7 @@
             PostfixExpressionNode(Node* n1, Node* n2) {
                 children = vector<Node*>{n1, n2};
             }
-    }
+    };
 
     class ArgumentExpressionListNode: public Node {
         public:
@@ -181,10 +181,10 @@
                 return("ArgumentExpressionList");
             }
 
-            ArgumentExpressionList(Node* n1) {
+            ArgumentExpressionListNode(Node* n1) {
                 children = vector<Node*>{n1};
             }
-    }
+    };
 
     class ExpressionNode: public Node {
         public:
@@ -196,7 +196,8 @@
             children = vector<Node*>{n1};
 
         }
-    }
+    };
+
     class UnaryExpressionNode : public Node{
         public:
             string print(){
@@ -207,7 +208,7 @@
             children = vector<Node*>{n1};
 
         }
-    }
+    };
 
     class  UnaryOperatorNode: public Node{
         public:
@@ -219,7 +220,7 @@
             children = vector<Node*>{n1};
 
         }
-    }
+    };
 
     
 
@@ -238,7 +239,7 @@
             children = vector<Node*>{n1,n2,n3};
 
         }
-    }
+    };
     class AssignmentExpressionNode: public Node{
         public:
 
@@ -253,7 +254,7 @@
             children = vector<Node*>{n1,n2,n3};
 
         }
-    }
+    };
     class ConstantExpressionNode: public Node{
         public:
             string print(){
@@ -264,7 +265,7 @@
             children = vector<Node*>{n1};
 
         }
-    }
+    };
 
     class DeclarationNode: public Node{
             public:
@@ -280,7 +281,7 @@
             children = vector<Node*>{n1,n2};
 
         }
-    }
+    };
 
     class DeclarationSpecifiersNode: public Node{
             public:
@@ -296,7 +297,7 @@
             children = vector<Node*>{n1,n2};
 
         }
-    }
+    };
 
     class FunctionSpecifierNode:public Node{
             public:
@@ -308,8 +309,9 @@
             children = vector<Node*>{n1};
 
         }
-    }
-        class TypeSpecifierNode:public Node{
+    };
+    
+    class TypeSpecifierNode:public Node{
             public:
             string print(){
                 return("TypeSpecifierNode");
@@ -319,7 +321,8 @@
             children = vector<Node*>{n1};
 
         }
-    }
+    };
+
     class StructOrUnionSpecifierNode: public Node{
             public:
             string print(){
@@ -330,11 +333,11 @@
             children = vector<Node*>{n1,n2,n3};
 
         }
-        InitDeclaratorListNode(Node* n1,Node* n2){
+        StructOrUnionSpecifierNode(Node* n1,Node* n2){
             children = vector<Node*>{n1,n2};
 
         }
-    }
+    };
 
     class  StructDeclarationListNode: public Node{
             public:
@@ -350,7 +353,8 @@
             children = vector<Node*>{n1,n2};
 
         }
-    }
+    };
+
     class  StructDeclarationNode: public Node{
             public:
             string print(){
@@ -365,7 +369,7 @@
             children = vector<Node*>{n1,n2};
 
         }
-    }
+    };
 
     class StructDeclaratorListNode: public Node{
             public:
@@ -381,7 +385,8 @@
             children = vector<Node*>{n1,n2};
 
         }
-    }
+    };
+
         class StructDeclaratorNode: public Node{
             public:
             string print(){
@@ -396,7 +401,8 @@
             children = vector<Node*>{n1,n2};
 
         }
-    }
+    };
+
 
     class SpecifierQualifierListNode : public Node {
     public:
@@ -411,7 +417,7 @@
         SpecifierQualifierListNode(Node* n1,Node* n2) {
             children = vector<Node*>{n1, n2};
         }
-    }
+    };
 
     class EnumSpecifierNode : public Node {
     public:
@@ -426,7 +432,7 @@
         EnumSpecifierNode(Node* n1, Node* n2) {
             children = vector<Node*>{n1, n2};
         }
-    }
+    };
 
     class EnumeratorNode: public Node {
     public:
@@ -442,8 +448,10 @@
             children = vector<Node*>{n1,n2};
 
         }
-    }
+    };
+
     class TypeNameNode: public Node {
+        public:
             string print(){
                 return("TypeNameNode");
             }
@@ -456,8 +464,10 @@
             children = vector<Node*>{n1,n2};
 
         }
-    }
+    };
+
     class AbstractDeclaratorNode :  public Node {
+        public:
             string print(){
                 return("AbstractDeclaratorNode");
             }
@@ -470,7 +480,7 @@
             children = vector<Node*>{n1,n2};
 
         }
-    }
+    };
 
     class DirectAbstractDeclaratorNode : public Node {
         public:
@@ -485,9 +495,10 @@
             DirectAbstractDeclaratorNode(Node* n1,Node* n2) {
                 children = vector<Node*>{n1, n2};
             }
-    }
+    };
 
     class  EnumeratorListNode :public Node {
+        public:
             string print(){
                 return("EnumeratorListNode");
             }
@@ -495,8 +506,10 @@
         EnumeratorListNode(Node* n1){
             children = vector<Node*>{n1};
 
-        }}
-    class InitDeclaratorListNodeNode: public Node{
+        }
+    };
+
+    class InitDeclaratorListNode: public Node{
             public:
             string print(){
                 return("InitDeclaratorListNode");
@@ -510,7 +523,7 @@
             children = vector<Node*>{n1,n2};
 
         }
-    }
+    };
 
     class StorageClassSpecifierNode: public Node{
         public:
@@ -522,7 +535,7 @@
             children = vector<Node*>{n1};
 
         }
-    }
+    };
 
     class InitDeclaratorNode :public Node{
         public:
@@ -538,7 +551,7 @@
             children = vector<Node*>{n1,n2};
 
         }
-    }
+    };
 
     class InitializerNode : public Node{
         public:
@@ -550,7 +563,8 @@
             children = vector<Node*>{n1};
 
         }
-    }
+    };
+
     class InitializerListNode : public Node{
         public:
             string print(){
@@ -561,7 +575,7 @@
             children = vector<Node*>{n1};
 
         }
-    }
+    };
 
     class DesignatorNode: public Node{
         public:
@@ -573,7 +587,8 @@
             children = vector<Node*>{n1};
 
         }
-    }
+    };
+
     class DesignatorListNode: public Node{
         public:
             string print(){
@@ -588,7 +603,8 @@
             children = vector<Node*>{n1,n2};
 
         }
-    }
+    };
+
     class DesignationNode: public Node{
         public:
             string print(){
@@ -599,7 +615,8 @@
             children = vector<Node*>{n1};
 
         }
-    }
+    };
+
     class DeclaratorNode: public Node{
         public:
             string print(){
@@ -614,7 +631,7 @@
             children = vector<Node*>{n1, n2};
 
         }
-    }
+    };
 
     class PointerNode : public Node
     {
@@ -633,8 +650,9 @@
         }
         PointerNode(){
         }
-    }
-class DirectDeclaratorListNode: public Node
+    };
+
+    class DirectDeclaratorListNode: public Node
     {
         public:
             string print(){
@@ -651,7 +669,7 @@ class DirectDeclaratorListNode: public Node
         }
        DirectDeclaratorListNode(){
         }
-    }
+    };
 
 
     class TypeQualifierListNode :  public Node{
@@ -663,7 +681,7 @@ class DirectDeclaratorListNode: public Node
          TypeQualifierListNode(){
 
         }
-    }
+    };
 
     class TypeQualifierNode : public Node{
         public:
@@ -675,7 +693,7 @@ class DirectDeclaratorListNode: public Node
             children = vector<Node*>{n1};
 
         }
-    }
+    };
 
     class ParameterClassList:public Node{
         public:
@@ -691,7 +709,7 @@ class DirectDeclaratorListNode: public Node
             children = vector<Node*>{n2};
 
         }
-    }
+    };
 
     class  ParameterListNode : public Node{
         public:
@@ -703,7 +721,7 @@ class DirectDeclaratorListNode: public Node
             children = vector<Node*>{n1};
 
         }
-    }
+    };
 
     class ParameterDeclarationNode : public Node{
         public:
@@ -720,7 +738,7 @@ class DirectDeclaratorListNode: public Node
 
         }
 
-    }
+    };
 }
 
 // Tokens
