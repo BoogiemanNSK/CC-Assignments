@@ -86,7 +86,7 @@ ANYCHAR?'(\\.|[^\\'\n])+' 	{ fprintf(yyout, "LITERAL %s\n", yytext); }
 "-"				{ fprintf(yyout, "MINUS\n"); }
 "+"				{ fprintf(yyout, "PLUS\n"); }
 "*"				{ fprintf(yyout, "STAR\n"); }
-"/"				{ fprintf(yyout, "BACK_SLASH\n"); }
+"/"				{ fprintf(yyout, "SLASH\n"); }
 "%"				{ fprintf(yyout, "MOD_OP\n"); }
 "<"				{ fprintf(yyout, "G_OP\n"); }
 ">"				{ fprintf(yyout, "L_OP\n"); }

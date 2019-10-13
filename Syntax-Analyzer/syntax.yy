@@ -416,7 +416,7 @@
         }
     }
 
-    class EnumSpecifierNode :  public:
+    class EnumSpecifierNode :  public Node {
             string print(){
                 return("EnumSpecifierNode")
             }
@@ -431,7 +431,7 @@
         }
     }
 
-    class EnumeratorNode: public:
+    class EnumeratorNode: public Node {
             string print(){
                 return("EnumeratorNode")
             }
@@ -445,7 +445,7 @@
 
         }
     }
-    class TypeNameNode: public:
+    class TypeNameNode: public Node {
             string print(){
                 return("TypeNameNode")
             }
@@ -459,7 +459,7 @@
 
         }
     }
-    class AbstractDeclaratorNode :  public:
+    class AbstractDeclaratorNode :  public Node {
             string print(){
                 return("AbstractDeclaratorNode")
             }
@@ -474,7 +474,7 @@
         }
     }
 
-    class  EnumeratorListNode :public:
+    class  EnumeratorListNode :public Node {
             string print(){
                 return("EnumeratorListNode")
             }
@@ -707,7 +707,7 @@ class DirectDeclaratorListNode: public Node
         }
 
     }
-
+}
 
 // Tokens
 
@@ -806,7 +806,7 @@ class DirectDeclaratorListNode: public Node
 %token MINUS "-"
 %token PLUS "+"
 %token STAR "*"
-%token BACK_SLASH "/"
+%token SLASH "/"
 %token MOD_OP "%"
 %token G_OP "<"
 %token L_OP ">"
@@ -919,25 +919,25 @@ primary_expression:
       IDENTIFIER            { $$ = new PrimaryExpressionNode(new IdentifierNode("ab")); }
     | LITERAL               { $$ = new PrimaryExpressionNode(new NumericLiteralNode("1")); }
     | STRING_LITERAL        { $$ = new PrimaryExpressionNode(new StrLiteralNode("String")); }
-    | '(' expression ')'    { $$ = new PrimaryExpressionNode(NULL); }
+    | LEFT_PAR expression RIGHT_PAR    { $$ = new PrimaryExpressionNode(NULL); }
 ;
 
 postfix_expression:
       primary_expression { $$ = new PostfixExpressionNode($1);}
-    | postfix_expression '[' expression ']' {$1->children.push_back($3); $$ = $1 ;}
-    | postfix_expression '(' argument_expression_list ')'
-    | postfix_expression '(' ')'{$$ = $1;}
-    | postfix_expression '.' IDENTIFIER {$1->children.push_back(new IdentifierNode($3)); $$ = $1 ;}
-    | postfix_expression PTR_OP IDENTIFIERP{$1 -> children.push_pack(new OperatorNode($2));$1->children.push_back(new IdentifierNode($3)); $$=$1;}
+    | postfix_expression LEFT_BRACKET expression RIGHT_BRACKET {$1->children.push_back($3); $$ = $1 ;}
+    | postfix_expression LEFT_PAR argument_expression_list RIGHT_PAR
+    | postfix_expression LEFT_PAR RIGHT_PAR{$$ = $1;}
+    | postfix_expression DOT IDENTIFIER {$1->children.push_back(new IdentifierNode($3)); $$ = $1 ;}
+    | postfix_expression PTR_OP IDENTIFIER{$1 -> children.push_pack(new OperatorNode($2));$1->children.push_back(new IdentifierNode($3)); $$=$1;}
     | postfix_expression INC_OP{$1 -> children.push_pack(new OperatorNode($2));$1->children.push_back(new IdentifierNode($3)); $$=$1;}
     | postfix_expression DEC_OP{$1 -> children.push_pack(new OperatorNode($2));$1->children.push_back(new IdentifierNode($3)); $$=$1;}
-    | '(' type_name ')' '{' initializer_list '}'{ $$ = new PostfixExpressionNode($2,$5);}
-    | '(' type_name ')' '{' initializer_list ',' '}'{$$= new PostfixExpressionNode($2,$5);}
+    | LEFT_PAR type_name RIGHT_PAR LEFT_CBRACKET initializer_list RIGHT_CBRACKET{ $$ = new PostfixExpressionNode($2,$5);}
+    | LEFT_PAR type_name RIGHT_PAR LEFT_CBRACKET initializer_list COMMA RIGHT_CBRACKET{$$= new PostfixExpressionNode($2,$5);}
 ;
 
 argument_expression_list:
-      IDENTIFIER($$ = new ArgumentExpressionList(new IdentifierNode($1);))
-    | IDENTIFIER ',' argument_expression_list {$3->children.push_back(new IdentifierNode($1)); $$=$3;}
+      IDENTIFIER{$$ = new ArgumentExpressionList(new IdentifierNode($1));}
+    | IDENTIFIER COMMA argument_expression_list {$3->children.push_back(new IdentifierNode($1)); $$=$3;}
 ;
 
 unary_expression:
@@ -946,34 +946,34 @@ unary_expression:
     | DEC_OP unary_expression {$2 -> children.push_pack((new OperatorNode($1)); $$=$2;}
     | unary_operator cast_expression {$1 ->children.push_back(new CastExpressionNode($2)); $$ = $1;}
     | SIZEOF unary_expression {$2 -> children.push_pack(new OperatorNode($1)); $$=$2;}
-    | SIZEOF '(' type_name ')' {$$ = new UnaryExpressionNode("(new OperatorNode($1)", $3);}
+    | SIZEOF LEFT_PAR type_name RIGHT_PAR {$$ = new UnaryExpressionNode("(new OperatorNode($1)", $3);}
 ;
 
 unary_operator:
-      '&'{$$ = new UnaryOperatorNode(new OperatorNode($1);}
-    | '*'{$$ = new UnaryOperatorNode(new OperatorNode($1);}
-    | '+'{$$ = new UnaryOperatorNode(new OperatorNode($1);}
-    | '-'{$$ = new UnaryOperatorNode(new OperatorNode($1);}
-    | '˜'{$$ = new UnaryOperatorNode(new OperatorNode($1);}
-    | '!'{$$ = new UnaryOperatorNode(new OperatorNode($1);}
+      AMP{$$ = new UnaryOperatorNode(new OperatorNode($1);}
+    | STAR{$$ = new UnaryOperatorNode(new OperatorNode($1);}
+    | PLUS{$$ = new UnaryOperatorNode(new OperatorNode($1);}
+    | MINUS{$$ = new UnaryOperatorNode(new OperatorNode($1);}
+    | BIN_NOT_OP{$$ = new UnaryOperatorNode(new OperatorNode($1);}
+    | LOG_NOT_OP{$$ = new UnaryOperatorNode(new OperatorNode($1);}
 ;
 
 cast_expression:
       unary_expression { $$ = new CastExpressionNode($1) }
-    | '(' type_name ')' cast_expression { $$ = new CastExpressionNode($2, $4); }
+    | LEFT_PAR type_name RIGHT_PAR cast_expression { $$ = new CastExpressionNode($2, $4); }
 ;
 
 multiplicative_expression:
       cast_expression { $$ = new BinaryExpressionNode($1); }
-    | multiplicative_expression '*' cast_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
-    | multiplicative_expression '/' cast_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
-    | multiplicative_expression '%' cast_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | multiplicative_expression STAR cast_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | multiplicative_expression SLASH cast_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | multiplicative_expression MOD_OP cast_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 additive_expression:
       multiplicative_expression { $$ = new BinaryExpressionNode($1); }
-    | additive_expression '+' multiplicative_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
-    | additive_expression '-' multiplicative_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | additive_expression PLUS multiplicative_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | additive_expression MINUS multiplicative_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 shift_expression:
@@ -984,8 +984,8 @@ shift_expression:
 
 relational_expression:
       shift_expression { $$ = new BinaryExpressionNode($1) ;}
-    | relational_expression '<' shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
-    | relational_expression '>' shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | relational_expression L_OP shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | relational_expression G_OP shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
     | relational_expression LE_OP shift_expression { $$ = $1->children.push_back($3); $$ = $1->children.push_back(new OperatorNode($2)); $1->ops.push_back($2); }
     | relational_expression GE_OP shift_expression { $$ = $1->children.push_back($3); $$ = $1->children.push_back(new OperatorNode($2));$1->ops.push_back($2); }
 ;
@@ -998,17 +998,17 @@ equality_expression:
 
 and_expression:
       equality_expression { $$ = new BinaryExpressionNode($1) ;}
-    | and_expression '&' equality_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | and_expression AMP equality_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 exclusive_or_expression:
       and_expression { $$ = new BinaryExpressionNode($1); }
-    | exclusive_or_expression 'ˆ' and_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | exclusive_or_expression BIN_XOR_OP and_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 inclusive_or_expression:
       exclusive_or_expression { $$ = new BinaryExpressionNode($1) ;}
-    | inclusive_or_expression '|' exclusive_or_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | inclusive_or_expression BIN_OR_OP exclusive_or_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 logical_and_expression:
@@ -1023,7 +1023,7 @@ logical_or_expression:
 
 conditional_expression:
       logical_or_expression { $$ = new ConditionalExpressionNode($1); }
-    | logical_or_expression '?' expression ':' conditional_expression { $$ = new ConditionalExpressionNode($1,$3,$5); }
+    | logical_or_expression TERNARY_OP expression COLON conditional_expression { $$ = new ConditionalExpressionNode($1,$3,$5); }
 ;
 
 assignment_expression:
@@ -1032,7 +1032,7 @@ assignment_expression:
 ;
 
 assignment_operator:
-      '=' { $$ = new OperatorNode("=") } 
+      ASSIGN_OP { $$ = new OperatorNode("=") } 
     | MUL_ASSIGN { $$ = new OperatorNode("*=") }
     | DIV_ASSIGN { $$ = new OperatorNode("/=") }
     | MOD_ASSIGN { $$ = new OperatorNode("%=") }
@@ -1047,12 +1047,12 @@ assignment_operator:
 
 expression:
       assignment_expression {$$ = new ExpressionNode($1);}
-    | expression ',' assignment_expression {$1->children.push_back($3); $$ = $1 ;}
+    | expression COMMA assignment_expression {$1->children.push_back($3); $$ = $1 ;}
 ;
 
 conditional_expression: 
     logical_or_expression {$$ = new ConditionalExpressionNode($1);}
-	| logical_or_expression '?' expression ':' conditional_expression {$$ = new ConditionalExpressionNode($1, $3, $5); ;}
+	| logical_or_expression TERNARY_OP expression COLON conditional_expression {$$ = new ConditionalExpressionNode($1, $3, $5); ;}
 ;
 
 constant_expression:
@@ -1060,8 +1060,8 @@ constant_expression:
 ;
 
 declaration:
-    declaration_specifiers ';' {$$ = new DeclarationNode($1);}|
-	declaration_specifiers init_declarator_list ';' { $$ = new DeclarationNode($1,$2);}
+    declaration_specifiers SEMICOLON {$$ = new DeclarationNode($1);}|
+	declaration_specifiers init_declarator_list SEMICOLON { $$ = new DeclarationNode($1,$2);}
 ;
 
 declaration_specifiers: 
@@ -1083,29 +1083,29 @@ storage_class_specifier:
 
 init_declarator_list:
 	init_declarator{$$ = new InitDeclaratorListNode($1);} |   
-	init_declarator_list ',' init_declarator{$1->children.push_back($3); $$ = $1 ;}
+	init_declarator_list COMMA init_declarator{$1->children.push_back($3); $$ = $1 ;}
 ;
 
 init_declarator:
 	declarator {$$ = new  InitDeclaratorNode($1);}|
-	declarator '=' initializer {$$ = new  InitDeclaratorNode($1, $3);}
+	declarator ASSIGN_OP initializer {$$ = new  InitDeclaratorNode($1, $3);}
 ;
 
 initializer:
 	assignment_expression {$$ = new  InitalizerNode($1);} |
-	'{' initializer_list '}' {$$ = new  InitalizerNode($2);}|
-	'{' initializer_list ',' '}' {$$ = new  InitalizerNode($2);}
+	LEFT_CBRACKET initializer_list RIGHT_CBRACKET {$$ = new  InitalizerNode($2);}|
+	LEFT_CBRACKET initializer_list COMMA RIGHT_CBRACKET {$$ = new  InitalizerNode($2);}
 ;
 
 initializer_list:
 	initializer  {$$ = new  InitalizerListNode($1);}|
 	designation initializer   {$$ = new  InitalizerListNode($1);} |
-	initializer_list ',' initializer {$1->children.push_back($3); $$ = $1 ;} |
-	initializer_list ',' designation initializer{$1->children.push_back($3); $$ = $1 ;}
+	initializer_list COMMA initializer {$1->children.push_back($3); $$ = $1 ;} |
+	initializer_list COMMA designation initializer{$1->children.push_back($3); $$ = $1 ;}
 ;
 
 designation:
-	designator_list '=' {$$ = new DesignationNode($1);}
+	designator_list ASSIGN_OP {$$ = new DesignationNode($1);}
 ;
 
 designator_list:
@@ -1114,8 +1114,8 @@ designator_list:
 ;
 
 designator:
-	'[' constant_expression ']'  { $$ = new DesignatorNode($2);}|
-	'.' IDENTIFIER{ $$ = new DesignatorNode(new IdentifierNode($2));}
+	LEFT_BRACKET constant_expression RIGHT_BRACKET  { $$ = new DesignatorNode($2);}|
+	DOT IDENTIFIER{ $$ = new DesignatorNode(new IdentifierNode($2));}
 ;
 
 declarator: 
@@ -1124,26 +1124,26 @@ declarator:
 ;
 
 pointer:
-	'*' {$$ = new PointerNode();}|
-	'*' type_qualifier_list {$$ = new PointerNode($2);}|
-	'*' pointer {$$ = new PointerNode($2);}|
-	'*' type_qualifier_list pointer {$3->children.push_back($2); $$ = $3 ;}
+	STAR {$$ = new PointerNode();}|
+	STAR type_qualifier_list {$$ = new PointerNode($2);}|
+	STAR pointer {$$ = new PointerNode($2);}|
+	STAR type_qualifier_list pointer {$3->children.push_back($2); $$ = $3 ;}
 ;
 
 direct_declarator: 
     IDENTIFIER {$$ = new DirectDeclaratorNode(new IdentifierNode($1));}|
-	'(' declarator ')'{$$ = new DirectDeclaratorNode($2);} |
-	direct_declarator '[' type_qualifier_list assignment_expression ']'{$1->children.push_back($3);$1->children.push_back($4); $$ = $1 ;} |
-	direct_declarator '[' type_qualifier_list ']' {$1->children.push_back($3);$ $$ = $1 ;}|
-	direct_declarator '[' assignment_expression ']' {$1->children.push_back($3);$ $$ = $1 ;}|
-	direct_declarator '[' STATIC type_qualifier_list assignment_expression ']'{$1->children.push_back("static"); $1->children.push_back($4);$1->children.push_back($5); $$ = $1 ;} |
-	direct_declarator '[' type_qualifier_list STATIC assignment_expression ']'{$1->children.push_back($3); $1->children.push_back("static");$1->children.push_back($5); $$ = $1 ;} |
-	direct_declarator '[' type_qualifier_list '*' ']' {$1->children.push_back($3); $$ = $1 ;}|
-	direct_declarator '[' '*' ']' {$$ = $1;} |
-	direct_declarator '[' ']' {$$ = $1;}|
-	direct_declarator '(' parameter_type_list ')' {$1->children.push_back($3); $$ = $1 ;}|
-	direct_declarator '(' identifier_list ')' {$1->children.push_back($3); $$ = $1 ;}|
-	direct_declarator '(' ')'{$$ = $1 ;}
+	LEFT_PAR declarator RIGHT_PAR{$$ = new DirectDeclaratorNode($2);} |
+	direct_declarator LEFT_BRACKET type_qualifier_list assignment_expression RIGHT_BRACKET{$1->children.push_back($3);$1->children.push_back($4); $$ = $1 ;} |
+	direct_declarator LEFT_BRACKET type_qualifier_list RIGHT_BRACKET {$1->children.push_back($3);$ $$ = $1 ;}|
+	direct_declarator LEFT_BRACKET assignment_expression RIGHT_BRACKET {$1->children.push_back($3);$ $$ = $1 ;}|
+	direct_declarator LEFT_BRACKET STATIC type_qualifier_list assignment_expression RIGHT_BRACKET{$1->children.push_back("static"); $1->children.push_back($4);$1->children.push_back($5); $$ = $1 ;} |
+	direct_declarator LEFT_BRACKET type_qualifier_list STATIC assignment_expression RIGHT_BRACKET{$1->children.push_back($3); $1->children.push_back("static");$1->children.push_back($5); $$ = $1 ;} |
+	direct_declarator LEFT_BRACKET type_qualifier_list STAR RIGHT_BRACKET {$1->children.push_back($3); $$ = $1 ;}|
+	direct_declarator LEFT_BRACKET STAR RIGHT_BRACKET {$$ = $1;} |
+	direct_declarator LEFT_BRACKET RIGHT_BRACKET {$$ = $1;}|
+	direct_declarator LEFT_PAR parameter_type_list RIGHT_PAR {$1->children.push_back($3); $$ = $1 ;}|
+	direct_declarator LEFT_PAR identifier_list RIGHT_PAR {$1->children.push_back($3); $$ = $1 ;}|
+	direct_declarator LEFT_PAR RIGHT_PAR{$$ = $1 ;}
 ;
 
 type_qualifier_list:
@@ -1158,12 +1158,12 @@ type_qualifier:
 ;
 parameter_type_list: 
     parameter_list {$$ = new ParameterTypeList($1);}|
-	parameter_list ',' ELLIPSIS{$$ = new ParameterTypeList($1, new KeywordNode($3));}
+	parameter_list COMMA ELLIPSIS{$$ = new ParameterTypeList($1, new KeywordNode($3));}
 ;
 
 parameter_list:
-	parameter_declaration ';' {$$ = new ParameterListNode($1);}|
-	parameter_list ',' parameter_declaration{$1->children.push_back($3); $$ = $1 ;}
+	parameter_declaration SEMICOLON {$$ = new ParameterListNode($1);}|
+	parameter_list COMMA parameter_declaration{$1->children.push_back($3); $$ = $1 ;}
 ;
 
 parameter_declaration:
@@ -1193,8 +1193,8 @@ type_specifier:
 ;
 
 struct_or_union_specifier:
-	struct_or_union IDENTIFIER '{' struct_declaration_list '}' {$$ = new StructOrUnionSpecifierNode($1, new IdentifierNode($2),$4);}|
-	struct_or_union '{' struct_declaration_list '}' {$$ = new StructOrUnionSpecifierNode($1, $3);}|
+	struct_or_union IDENTIFIER LEFT_CBRACKET struct_declaration_list RIGHT_CBRACKET {$$ = new StructOrUnionSpecifierNode($1, new IdentifierNode($2),$4);}|
+	struct_or_union LEFT_CBRACKET struct_declaration_list RIGHT_CBRACKET {$$ = new StructOrUnionSpecifierNode($1, $3);}|
 	struct_or_union IDENTIFIER {$$ = new StructOrUnionSpecifierNode($1, new IdentifierNode($2));}
 ;
 
@@ -1209,18 +1209,18 @@ struct_declaration_list:
 ;
 
 struct_declaration:
-	specifier_qualifier_list struct_declarator_list ';'{$$ = new StructDeclarationNode($1,$2);}
+	specifier_qualifier_list struct_declarator_list SEMICOLON{$$ = new StructDeclarationNode($1,$2);}
 ;
 
 struct_declarator_list:
 	struct_declarator {$$ = new StructDeclaratorListNode($1);}|
-	struct_declarator_list ',' struct_declarator {$1->children.push_back($2); $$ = $1 ;}
+	struct_declarator_list COMMA struct_declarator {$1->children.push_back($2); $$ = $1 ;}
 ;
 
 struct_declarator:
 	declarator{ $$ = new StructDeclaratorNode($1);} |
-	':' constant_expression { $$ = new StructDeclaratorNode($2);}|
-	declarator ':' constant_expression{{ $$ = new StructDeclaratorNode($1,$3);}}
+	COLON constant_expression { $$ = new StructDeclaratorNode($2);}|
+	declarator COLON constant_expression{{ $$ = new StructDeclaratorNode($1,$3);}}
 ;
 
 specifier_qualifier_list:
@@ -1232,21 +1232,21 @@ specifier_qualifier_list:
 
 
 enum_specifier: 
-    ENUM '{' enumerator_list '}' {$$ = new EnumSpecifierNode(new KeywordNode($1), $3);}|
-	ENUM IDENTIFIER '{' enumerator_list '}'  {$$ = new EnumSpecifierNode(new KeywordNode($1),new IdentifierNode($2), $3);}|
-	ENUM '{' enumerator_list ',' '}'  {$$ = new EnumSpecifierNode(new KeywordNode($1), $3);}|
-	ENUM IDENTIFIER '{' enumerator_list ',' '}' {$$ = new EnumSpecifierNode(new KeywordNode($1),new IdentifierNode($2), $3);} |
+    ENUM LEFT_CBRACKET enumerator_list RIGHT_CBRACKET {$$ = new EnumSpecifierNode(new KeywordNode($1), $3);}|
+	ENUM IDENTIFIER LEFT_CBRACKET enumerator_list RIGHT_CBRACKET  {$$ = new EnumSpecifierNode(new KeywordNode($1),new IdentifierNode($2), $3);}|
+	ENUM LEFT_CBRACKET enumerator_list COMMA RIGHT_CBRACKET  {$$ = new EnumSpecifierNode(new KeywordNode($1), $3);}|
+	ENUM IDENTIFIER LEFT_CBRACKET enumerator_list COMMA RIGHT_CBRACKET {$$ = new EnumSpecifierNode(new KeywordNode($1),new IdentifierNode($2), $3);} |
 	ENUM IDENTIFIER {$$ = new EnumSpecifierNode(new KeywordNode($1),new IdentifierNode($2));}
 ;
 
 enumerator_list:
 	enumerator {$$ = new EnumeratorListNode($1);}|
-	enumerator_list ',' enumerator{{$1->children.push_back($3); $$ = $1 ;}}
+	enumerator_list COMMA enumerator{{$1->children.push_back($3); $$ = $1 ;}}
 ;
 
 enumerator: 
     IDENTIFIER {$$ = new EnumeratorNode(new IdentifierNode($1));}|
-	IDENTIFIER '=' constant_expression{$$ = new EnumeratorNode(new IdentifierNode($1),$3);}
+	IDENTIFIER ASSIGN_OP constant_expression{$$ = new EnumeratorNode(new IdentifierNode($1),$3);}
 ;
 
 type_name:
@@ -1261,17 +1261,17 @@ abstract_declarator:
 ;
 
 direct_abstract_declarator:
-	'(' abstract_declarator ')'{$$ = new DirectAbstractDeclaratorNode($2);} |
-	'[' ']' {$$ = new DirectAbstractDeclaratorNode();}|
-	'[' assignment_expression ']' {$$ = new DirectAbstractDeclaratorNode($2);} |
-	direct_abstract_declarator '[' ']'  |
-	direct_abstract_declarator '[' assignment_expression ']'|
-	'[' '*' ']' |
-	direct_abstract_declarator '[' '*' ']' |
-	'(' ')' |
-	'(' parameter_type_list ')' |
-	direct_abstract_declarator '(' ')' |
-	direct_abstract_declarator '(' parameter_type_list ')' 
+	LEFT_PAR abstract_declarator RIGHT_PAR{$$ = new DirectAbstractDeclaratorNode($2);} |
+	LEFT_BRACKET RIGHT_BRACKET {$$ = new DirectAbstractDeclaratorNode();}|
+	LEFT_BRACKET assignment_expression RIGHT_BRACKET {$$ = new DirectAbstractDeclaratorNode($2);} |
+	direct_abstract_declarator LEFT_BRACKET RIGHT_BRACKET  |
+	direct_abstract_declarator LEFT_BRACKET assignment_expression RIGHT_BRACKET|
+	LEFT_BRACKET STAR RIGHT_BRACKET |
+	direct_abstract_declarator LEFT_BRACKET STAR RIGHT_BRACKET |
+	LEFT_PAR RIGHT_PAR |
+	LEFT_PAR parameter_type_list RIGHT_PAR |
+	direct_abstract_declarator LEFT_PAR RIGHT_PAR |
+	direct_abstract_declarator LEFT_PAR parameter_type_list RIGHT_PAR 
 ;
 
 statement:
@@ -1284,14 +1284,14 @@ statement:
 ;
 
 labeled_statement:
-	IDENTIFIER ':' statement |
-	CASE constant_expression ':' statement |
-	DEFAULT ':' statement |
+	IDENTIFIER COLON statement |
+	CASE constant_expression COLON statement |
+	DEFAULT COLON statement |
 ;
 
 compound_statement:
-	'{' '}' |
-	'{' block_item_list '}'
+	LEFT_CBRACKET RIGHT_CBRACKET |
+	LEFT_CBRACKET block_item_list RIGHT_CBRACKET
 ;
 
 block_item_list:
@@ -1305,31 +1305,31 @@ block_item:
 ;
 
 expression_statement:
-	';'|
-	expression ';'
+	SEMICOLON|
+	expression SEMICOLON
 ;
 
 selection_statement:
-	IF '(' expression ')' statement |
-    IF '(' expression ')' statement ELSE statement |
-	SWITCH '(' expression ')' statement
+	IF LEFT_PAR expression RIGHT_PAR statement |
+    IF LEFT_PAR expression RIGHT_PAR statement ELSE statement |
+	SWITCH LEFT_PAR expression RIGHT_PAR statement
 ;
 
 iteration_statement:
-	WHILE '(' expression ')' statement |
-	DO statement WHILE '(' expression ')' ';' |
-	FOR '(' expression_statement expression_statement ')' statement |
-	FOR '(' expression_statement expression_statement expression ')' statement |
-	FOR '(' declaration expression_statement ')' statement |
-	FOR '(' declaration expression_statement expression ')' statement 
+	WHILE LEFT_PAR expression RIGHT_PAR statement |
+	DO statement WHILE LEFT_PAR expression RIGHT_PAR SEMICOLON |
+	FOR LEFT_PAR expression_statement expression_statement RIGHT_PAR statement |
+	FOR LEFT_PAR expression_statement expression_statement expression RIGHT_PAR statement |
+	FOR LEFT_PAR declaration expression_statement RIGHT_PAR statement |
+	FOR LEFT_PAR declaration expression_statement expression RIGHT_PAR statement 
 ;
 
 jump_statement: 
-	GOTO IDENTIFIER ';' |
-	CONTINUE ';' |
-	BREAK ';' | 
-	RETURN ';' |
-    RETURN expression ';'
+	GOTO IDENTIFIER SEMICOLON |
+	CONTINUE SEMICOLON |
+	BREAK SEMICOLON | 
+	RETURN SEMICOLON |
+    RETURN expression SEMICOLON
 ;
 
 translation_unit:
@@ -1354,7 +1354,7 @@ declaration_list:
 
 identifier_list:
     IDENTIFIER
-  | identifier_list ',' IDENTIFIER
+  | identifier_list COMMA IDENTIFIER
 ;
 
 %%
