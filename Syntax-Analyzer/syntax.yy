@@ -130,6 +130,10 @@
                 children = vector<Node*>{node};
                 ops = vector<string>();
             }
+            MultiplicativeExpressionNode(Node* node, Node* n2) {
+                children = vector<Node*>{node,n2};
+                ops = vector<string>();
+            }
     }
 
     class OperatorNode : public Node {
@@ -141,6 +145,18 @@
             } 
 
             OperatorNode(string sign) {
+                _sign = sign;
+            }
+    }
+    class KeywordNode : public Node {
+        public:
+            string _sign;
+
+            public string print() {
+                return("Keyword(" + _sign + ")");
+            } 
+
+            KeywordNode(string sign) {
                 _sign = sign;
             }
     }
@@ -156,8 +172,23 @@
                                          children = vector<Node*>{n1};
 
                                      }
+        PostfixExpressionNode(Node* n1, Node* n2){
+                                         children = vector<Node*>{n1,n2};
+
+                                     }
     }
 
+    class ArgumentExpressionListNode: public Node{
+        public:
+            string print(){
+                return("ArgumentExpressionList")
+            }
+
+         ArgumentExpressionList(Node* n1){
+            children = vector<Node*>{n1};
+
+        }
+    }
     class ExpressionNode: public Node{
         public:
             string print(){
@@ -169,6 +200,32 @@
 
         }
     }
+    class UnaryExpressionNode : public Node{
+        public:
+            string print(){
+                return("UnaryExpressionNode")
+            }
+
+          UnaryExpressionNode(Node* n1){
+            children = vector<Node*>{n1};
+
+        }
+    }
+
+    class  UnaryOperatorNode: public Node{
+        public:
+            string print(){
+                return("UnaryOperatorNode")
+            }
+
+          UnaryOperatorNode(Node* n1){
+            children = vector<Node*>{n1};
+
+        }
+    }
+
+    
+
 
     class ConditionalExpressionNode: public Node{
         public:
@@ -185,7 +242,21 @@
 
         }
     }
+    class AssignmentExpressionNode: public Node{
+        public:
 
+            string print(){
+                return("AssignmentExpressionNode")
+            }
+        AssignmentExpressionNode(Node* n1){
+            children = vector<Node*>{n1};
+
+        }
+        AssignmentExpressionNode(Node* n1,Node* n2,Node* n3){
+            children = vector<Node*>{n1,n2,n3};
+
+        }
+    }
     class ConstantExpressionNode: public Node{
         public:
             string print(){
@@ -229,6 +300,189 @@
 
         }
     }
+
+    class FunctionSpecifierNode:public Node{
+            public:
+            string print(){
+                return("FunctionSpecifierNode")
+            }
+
+        FunctionSpecifierNode(Node* n1){
+            children = vector<Node*>{n1};
+
+        }
+    }
+        class TypeSpecifierNode:public Node{
+            public:
+            string print(){
+                return("TypeSpecifierNode")
+            }
+
+        TypeSpecifierNode(Node* n1){
+            children = vector<Node*>{n1};
+
+        }
+    }
+    class StructOrUnionSpecifierNode: public Node{
+            public:
+            string print(){
+                return("StructOrUnionSpecifierNode")
+            }
+
+        StructOrUnionSpecifierNode(Node* n1,Node* n2, Node* n3){
+            children = vector<Node*>{n1,n2,n3};
+
+        }
+        InitDeclaratorListNode(Node* n1,Node* n2){
+            children = vector<Node*>{n1,n2};
+
+        }
+    }
+
+    class  StructDeclarationListNode: public Node{
+            public:
+            string print(){
+                return("StructDeclarationListNode")
+            }
+
+        StructDeclarationListNode(Node* n1){
+            children = vector<Node*>{n1};
+
+        }
+         StructDeclarationListNode(Node* n1,Node* n2){
+            children = vector<Node*>{n1,n2};
+
+        }
+    }
+    class  StructDeclarationNode: public Node{
+            public:
+            string print(){
+                return("StructDeclarationNode")
+            }
+
+        StructDeclarationNode(Node* n1){
+            children = vector<Node*>{n1};
+
+        }
+         StructDeclarationNode(Node* n1,Node* n2){
+            children = vector<Node*>{n1,n2};
+
+        }
+    }
+
+    class StructDeclaratorListNode: public Node{
+            public:
+            string print(){
+                return("StructDeclaratorListNode")
+            }
+
+        StructDeclaratorListNode(Node* n1){
+            children = vector<Node*>{n1};
+
+        }
+         StructDeclaratorListNode(Node* n1,Node* n2){
+            children = vector<Node*>{n1,n2};
+
+        }
+    }
+        class StructDeclaratorNode: public Node{
+            public:
+            string print(){
+                return("StructDeclaratorNode")
+            }
+
+        StructDeclaratorNode(Node* n1){
+            children = vector<Node*>{n1};
+
+        }
+         StructDeclaratorNode(Node* n1,Node* n2){
+            children = vector<Node*>{n1,n2};
+
+        }
+    }
+    class SpecifierQualifierListNode:ublic Node{
+            public:
+            string print(){
+                return("SpecifierQualifierListNode")
+            }
+
+         SpecifierQualifierListNode(Node* n1){
+            children = vector<Node*>{n1};
+
+        }
+         SpecifierQualifierListNode(Node* n1,Node* n2){
+            children = vector<Node*>{n1,n2};
+
+        }
+    }
+
+    class EnumSpecifierNode :  public:
+            string print(){
+                return("EnumSpecifierNode")
+            }
+
+        EnumSpecifierNode(Node* n1, Node* n2, Node* n3){
+            children = vector<Node*>{n1,n2,n3};
+
+        }
+         EnumSpecifierNode(Node* n1,Node* n2){
+            children = vector<Node*>{n1,n2};
+
+        }
+    }
+
+    class EnumeratorNode: public:
+            string print(){
+                return("EnumeratorNode")
+            }
+
+         EnumeratorNode(Node* n1){
+            children = vector<Node*>{n1};
+
+        }
+        EnumeratorNode(Node* n1,Node* n2){
+            children = vector<Node*>{n1,n2};
+
+        }
+    }
+    class TypeNameNode: public:
+            string print(){
+                return("TypeNameNode")
+            }
+
+         TypeNameNode(Node* n1){
+            children = vector<Node*>{n1};
+
+        }
+        TypeNameNode(Node* n1,Node* n2){
+            children = vector<Node*>{n1,n2};
+
+        }
+    }
+    class AbstractDeclaratorNode :  public:
+            string print(){
+                return("AbstractDeclaratorNode")
+            }
+
+        AbstractDeclaratorNode(Node* n1){
+            children = vector<Node*>{n1};
+
+        }
+        AbstractDeclaratorNode(Node* n1,Node* n2){
+            children = vector<Node*>{n1,n2};
+
+        }
+    }
+
+    class  EnumeratorListNode :public:
+            string print(){
+                return("EnumeratorListNode")
+            }
+
+        EnumeratorListNode(Node* n1){
+            children = vector<Node*>{n1};
+
+        }}
     class InitDeclaratorListNodeNode: public Node{
             public:
             string print(){
@@ -252,10 +506,6 @@
             }
 
          StorageClassSpecifierNode(Node* n1){
-            children = vector<Node*>{n1};
-
-        }
-                StorageClassSpecifierNode(string n1){
             children = vector<Node*>{n1};
 
         }
@@ -371,22 +621,22 @@
         PointerNode(){
         }
     }
-class DirectDeclaratorList: public Node
+class DirectDeclaratorListNode: public Node
     {
         public:
             string print(){
                 return("DirectDeclaratorList")
             }
 
-       DirectDeclaratorList(Node* n1){
+       DirectDeclaratorListNode(Node* n1){
             children = vector<Node*>{n1};
 
         }
-       DirectDeclaratorList(Node* n1,Node* n2){
+       DirectDeclaratorListNode(Node* n1,Node* n2){
             children = vector<Node*>{n1, n2};
 
         }
-       DirectDeclaratorList(){
+       DirectDeclaratorListNode(){
         }
     }
 
@@ -408,7 +658,7 @@ class DirectDeclaratorList: public Node
                 return("TypeQualifierNode")
             }
 
-        TypeQualifierNode(string n1){
+        TypeQualifierNode(Node* n1){
             children = vector<Node*>{n1};
 
         }
@@ -420,7 +670,7 @@ class DirectDeclaratorList: public Node
                 return(" ParameterClassList")
             }
 
-         ParameterClassList(Node* n2, string n1){
+         ParameterClassList(Node* n2, Node* n1){
             children = vector<Node*>{n2,n1};
 
         }
@@ -458,17 +708,6 @@ class DirectDeclaratorList: public Node
 
     }
 
-    /*class EnumSpecNode : public Node {
-        public:
-            string _identifier;
-            vector<>
-
-            EnumSpecNode() {
-
-            }
-    }*/
-
-}
 
 // Tokens
 
@@ -688,108 +927,108 @@ postfix_expression:
     | postfix_expression '[' expression ']' {$1->children.push_back($3); $$ = $1 ;}
     | postfix_expression '(' argument_expression_list ')'
     | postfix_expression '(' ')'{$$ = $1;}
-    | postfix_expression '.' IDENTIFIER
-    | postfix_expression PTR_OP IDENTIFIER
-    | postfix_expression INC_OP
-    | postfix_expression DEC_OP
-    | '(' type_name ')' '{' initializer_list '}'
-    | '(' type_name ')' '{' initializer_list ',' '}'
+    | postfix_expression '.' IDENTIFIER {$1->children.push_back(new IdentifierNode($3)); $$ = $1 ;}
+    | postfix_expression PTR_OP IDENTIFIERP{$1 -> children.push_pack(new OperatorNode($2));$1->children.push_back(new IdentifierNode($3)); $$=$1;}
+    | postfix_expression INC_OP{$1 -> children.push_pack(new OperatorNode($2));$1->children.push_back(new IdentifierNode($3)); $$=$1;}
+    | postfix_expression DEC_OP{$1 -> children.push_pack(new OperatorNode($2));$1->children.push_back(new IdentifierNode($3)); $$=$1;}
+    | '(' type_name ')' '{' initializer_list '}'{ $$ = new PostfixExpressionNode($2,$5);}
+    | '(' type_name ')' '{' initializer_list ',' '}'{$$= new PostfixExpressionNode($2,$5);}
 ;
 
 argument_expression_list:
-      IDENTIFIER
-    | IDENTIFIER ',' argument_expression_list 
+      IDENTIFIER($$ = new ArgumentExpressionList(new IdentifierNode($1);))
+    | IDENTIFIER ',' argument_expression_list {$3->children.push_back(new IdentifierNode($1)); $$=$3;}
 ;
 
 unary_expression:
-      postfix_expression 
-    | INC_OP unary_expression 
-    | DEC_OP unary_expression 
-    | unary_operator cast_expression 
-    | SIZEOF unary_expression 
-    | SIZEOF '(' type_name ')' 
+      postfix_expression {$$ = new UnaryExpressionNode(new PostfixExpressionNode($1));}
+    | INC_OP unary_expression {$2 -> children.push_pack(new OperatorNode($1)); $$=$2;}
+    | DEC_OP unary_expression {$2 -> children.push_pack((new OperatorNode($1)); $$=$2;}
+    | unary_operator cast_expression {$1 ->children.push_back(new CastExpressionNode($2)); $$ = $1;}
+    | SIZEOF unary_expression {$2 -> children.push_pack(new OperatorNode($1)); $$=$2;}
+    | SIZEOF '(' type_name ')' {$$ = new UnaryExpressionNode("(new OperatorNode($1)", $3);}
 ;
 
 unary_operator:
-      '&'
-    | '*'
-    | '+'
-    | '-'
-    | '˜'
-    | '!'
+      '&'{$$ = new UnaryOperatorNode(new OperatorNode($1);}
+    | '*'{$$ = new UnaryOperatorNode(new OperatorNode($1);}
+    | '+'{$$ = new UnaryOperatorNode(new OperatorNode($1);}
+    | '-'{$$ = new UnaryOperatorNode(new OperatorNode($1);}
+    | '˜'{$$ = new UnaryOperatorNode(new OperatorNode($1);}
+    | '!'{$$ = new UnaryOperatorNode(new OperatorNode($1);}
 ;
 
 cast_expression:
       unary_expression { $$ = new CastExpressionNode($1) }
-    | '(' type_name ')' cast_expression { $$ = new CastExpressionNode($2, $4) }
+    | '(' type_name ')' cast_expression { $$ = new CastExpressionNode($2, $4); }
 ;
 
 multiplicative_expression:
-      cast_expression { $$ = new BinaryExpressionNode($1) }
+      cast_expression { $$ = new BinaryExpressionNode($1); }
     | multiplicative_expression '*' cast_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
     | multiplicative_expression '/' cast_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
     | multiplicative_expression '%' cast_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 additive_expression:
-      multiplicative_expression { $$ = new BinaryExpressionNode($1) }
+      multiplicative_expression { $$ = new BinaryExpressionNode($1); }
     | additive_expression '+' multiplicative_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
     | additive_expression '-' multiplicative_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 shift_expression:
-      additive_expression { $$ = new BinaryExpressionNode($1) }
+      additive_expression { $$ = new BinaryExpressionNode($1); }
     | shift_expression LEFT_OP additive_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
     | shift_expression RIGHT_OP additive_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 relational_expression:
-      shift_expression { $$ = new BinaryExpressionNode($1) }
+      shift_expression { $$ = new BinaryExpressionNode($1) ;}
     | relational_expression '<' shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
     | relational_expression '>' shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
-    | relational_expression LE_OP shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
-    | relational_expression GE_OP shift_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+    | relational_expression LE_OP shift_expression { $$ = $1->children.push_back($3); $$ = $1->children.push_back(new OperatorNode($2)); $1->ops.push_back($2); }
+    | relational_expression GE_OP shift_expression { $$ = $1->children.push_back($3); $$ = $1->children.push_back(new OperatorNode($2));$1->ops.push_back($2); }
 ;
 
 equality_expression:
-      relational_expression { $$ = new BinaryExpressionNode($1) }
-    | equality_expression EQ_OP relational_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
-    | equality_expression NE_OP relational_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+      relational_expression { $$ = new BinaryExpressionNode($1) ;}
+    | equality_expression EQ_OP relational_expression { $$ = $1->children.push_back($3); $$ = $1->children.push_back(new OperatorNode($2)); $1->ops.push_back($2); }
+    | equality_expression NE_OP relational_expression { $$ = $1->children.push_back($3); $$ = $1->children.push_back(new OperatorNode($2)); $1->ops.push_back($2); }
 ;
 
 and_expression:
-      equality_expression { $$ = new BinaryExpressionNode($1) }
+      equality_expression { $$ = new BinaryExpressionNode($1) ;}
     | and_expression '&' equality_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 exclusive_or_expression:
-      and_expression { $$ = new BinaryExpressionNode($1) }
+      and_expression { $$ = new BinaryExpressionNode($1); }
     | exclusive_or_expression 'ˆ' and_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 inclusive_or_expression:
-      exclusive_or_expression { $$ = new BinaryExpressionNode($1) }
+      exclusive_or_expression { $$ = new BinaryExpressionNode($1) ;}
     | inclusive_or_expression '|' exclusive_or_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
 ;
 
 logical_and_expression:
-      inclusive_or_expression { $$ = new BinaryExpressionNode($1) }
-    | logical_and_expression AND_OP inclusive_or_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+      inclusive_or_expression { $$ = new BinaryExpressionNode($1); }
+    | logical_and_expression AND_OP inclusive_or_expression { $$ = $1->children.push_back($3);$$ = $1->children.push_back(new OperatorNode($2)); $1->ops.push_back($2); }
 ;
 
 logical_or_expression: 
-      logical_and_expression { $$ = new BinaryExpressionNode($1) }
-    | logical_or_expression OR_OP logical_and_expression { $$ = $1->children.push_back($3); $1->ops.push_back($2); }
+      logical_and_expression { $$ = new BinaryExpressionNode($1) ;}
+    | logical_or_expression OR_OP logical_and_expression { $$ = $1->children.push_back($3); $$ = $1->children.push_back(new OperatorNode($2));$1->ops.push_back($2); }
 ;
 
 conditional_expression:
-      logical_or_expression { $$ = new ConditionalExpressionNode($1) }
-    | logical_or_expression '?' expression ':' conditional_expression { $$ =  }
+      logical_or_expression { $$ = new ConditionalExpressionNode($1); }
+    | logical_or_expression '?' expression ':' conditional_expression { $$ = new ConditionalExpressionNode($1,$3,$5); }
 ;
 
 assignment_expression:
-      conditional_expression { $$ = new AssignmentExpressionNode($1) }
-    | unary_expression assignment_operator assignment_expression { $$ =  }
+      conditional_expression { $$ = new AssignmentExpressionNode($1); }
+    | unary_expression assignment_operator assignment_expression { $$ = AssignmentExpressionNode($1,$2,$3); }
 ;
 
 assignment_operator:
@@ -836,11 +1075,12 @@ declaration_specifiers:
 	function_specifier declaration_specifiers { $$ = new DeclarationSpecifierNode($1,$2); }
 ;
 storage_class_specifier:
-	EXTERN  { $$ = new StorageClassSpecifierNode("extern"); } |
-	STATIC { $$ = new StorageClassSpecifierNode("static"); }  |
-	AUTO { $$ = new StorageClassSpecifierNode("auto"); } |
-	REGISTER { $$ = new StorageClassSpecifierNode("register"); } 
+	EXTERN  { $$ = new StorageClassSpecifierNode(new KeywordNode($1)); } |
+	STATIC { $$ = new StorageClassSpecifierNode(new KeywordNode($1)); }  |
+	AUTO { $$ = new StorageClassSpecifierNode(new KeywordNode($1)); } |
+	REGISTER { $$ = new StorageClassSpecifierNode(new KeywordNode($1)); } 
 ;
+
 init_declarator_list:
 	init_declarator{$$ = new InitDeclaratorListNode($1);} |   
 	init_declarator_list ',' init_declarator{$1->children.push_back($3); $$ = $1 ;}
@@ -848,7 +1088,7 @@ init_declarator_list:
 
 init_declarator:
 	declarator {$$ = new  InitDeclaratorNode($1);}|
-	declarator '=' initializer{$$ = new  InitDeclaratorNode($1, $3);}
+	declarator '=' initializer {$$ = new  InitDeclaratorNode($1, $3);}
 ;
 
 initializer:
@@ -912,13 +1152,13 @@ type_qualifier_list:
 ;
 
 type_qualifier:
-	CONST {$$ = new TypeQualifierNode('const');}|
-	RESTRICT  {$$ = new TypeQualifierNode('restrict');}|
-	VOLATILE {$$ = new TypeQualifierNode('volatile');}
+	CONST {$$ = new TypeQualifierNode(new KeywordNode($1));}|
+	RESTRICT  {$$ = new TypeQualifierNode(new KeywordNode($1));}|
+	VOLATILE {$$ = new TypeQualifierNode(new KeywordNode($1));}
 ;
 parameter_type_list: 
     parameter_list {$$ = new ParameterTypeList($1);}|
-	parameter_list ',' ELLIPSIS{$$ = new ParameterTypeList($1, 'elipsis');}
+	parameter_list ',' ELLIPSIS{$$ = new ParameterTypeList($1, new KeywordNode($3));}
 ;
 
 parameter_list:
@@ -932,100 +1172,100 @@ parameter_declaration:
 	declaration_specifiers{$$ = new ParameterDeclarationNode($1);}
 ;
 function_specifier: 
-    INLINE
+    INLINE{$$ = new FunctionSpecifierNode($1);}
 ;
 type_specifier:
-	VOID |
-	CHAR |
-	SHORT |
-	INT |
-	LONG |
-	FLOAT |
-	DOUBLE |
-	SIGNED |
-	UNSIGNED |
-	BOOL |
-	COMPLEX |
-	IMAGINARY |
-	struct_or_union_specifier |
-	enum_specifier |
-	type_name
+	VOID {$$ = new TypeSpecifierNode($1);}|
+	CHAR{$$ = new TypeSpecifierNode($1);} |
+	SHORT {$$ = new TypeSpecifierNode($1);}|
+	INT {$$ = new TypeSpecifierNode($1);}|
+	LONG{$$ = new TypeSpecifierNode($1);} |
+	FLOAT{$$ = new TypeSpecifierNode($1);} |
+	DOUBLE{$$ = new TypeSpecifierNode($1);} |
+	SIGNED {$$ = new TypeSpecifierNode($1);}|
+	UNSIGNED {$$ = new TypeSpecifierNode($1);}|
+	BOOL{$$ = new TypeSpecifierNode($1);} |
+	COMPLEX {$$ = new TypeSpecifierNode($1);}|
+	IMAGINARY {$$ = new TypeSpecifierNode($1);}|
+	struct_or_union_specifier {$$ = new TypeSpecifierNode($1);} |
+	enum_specifier{$$ = new TypeSpecifierNode($1);} |
+	type_name{$$ = new TypeSpecifierNode($1);}
 ;
 
 struct_or_union_specifier:
-	struct_or_union IDENTIFIER '{' struct_declaration_list '}' |
-	struct_or_union '{' struct_declaration_list '}' |
-	struct_or_union IDENTIFIER
+	struct_or_union IDENTIFIER '{' struct_declaration_list '}' {$$ = new StructOrUnionSpecifierNode($1, new IdentifierNode($2),$4);}|
+	struct_or_union '{' struct_declaration_list '}' {$$ = new StructOrUnionSpecifierNode($1, $3);}|
+	struct_or_union IDENTIFIER {$$ = new StructOrUnionSpecifierNode($1, new IdentifierNode($2));}
 ;
 
 struct_or_union:
-	STRUCT|
-	UNION
+	STRUCT {$$ = new KeywordNode($1);}|
+	UNION{$$ = new KeywordNode($1);}
 ;
 
 struct_declaration_list:
-	struct_declaration|
-	struct_declaration_list struct_declaration
+	struct_declaration{$$ = new StructDeclarationListNode($1);}|
+	struct_declaration_list struct_declaration {$1->children.push_back($2); $$ = $1 ;}
 ;
 
 struct_declaration:
-	specifier_qualifier_list struct_declarator_list ';'
+	specifier_qualifier_list struct_declarator_list ';'{$$ = new StructDeclarationNode($1,$2);}
 ;
 
 struct_declarator_list:
-	struct_declarator |
-	struct_declarator_list ',' struct_declarator
+	struct_declarator {$$ = new StructDeclaratorListNode($1);}|
+	struct_declarator_list ',' struct_declarator {$1->children.push_back($2); $$ = $1 ;}
 ;
 
 struct_declarator:
-	declarator |
-	':' constant_expression |
-	declarator ':' constant_expression
+	declarator{ $$ = new StructDeclaratorNode($1);} |
+	':' constant_expression { $$ = new StructDeclaratorNode($2);}|
+	declarator ':' constant_expression{{ $$ = new StructDeclaratorNode($1,$3);}}
 ;
 
 specifier_qualifier_list:
-	type_specifier specifier_qualifier_list |
-	type_specifier |
-	type_qualifier specifier_qualifier_list |
-	type_qualifier
+	type_specifier specifier_qualifier_list {$2->children.push_back($1); $$ = $2 ;} |
+	type_specifier{$$ = new SpecifierQualifierListNode($1);}|
+	type_qualifier specifier_qualifier_list {$2->children.push_back($1); $$ = $2 ;}|
+	type_qualifier{$$ = new SpecifierQualifierListNode($1);}
 ;
 
 
 enum_specifier: 
-    ENUM '{' enumerator_list '}' |
-	ENUM IDENTIFIER '{' enumerator_list '}' |
-	ENUM '{' enumerator_list ',' '}' |
-	ENUM IDENTIFIER '{' enumerator_list ',' '}' |
-	ENUM IDENTIFIER
+    ENUM '{' enumerator_list '}' {$$ = new EnumSpecifierNode(new KeywordNode($1), $3);}|
+	ENUM IDENTIFIER '{' enumerator_list '}'  {$$ = new EnumSpecifierNode(new KeywordNode($1),new IdentifierNode($2), $3);}|
+	ENUM '{' enumerator_list ',' '}'  {$$ = new EnumSpecifierNode(new KeywordNode($1), $3);}|
+	ENUM IDENTIFIER '{' enumerator_list ',' '}' {$$ = new EnumSpecifierNode(new KeywordNode($1),new IdentifierNode($2), $3);} |
+	ENUM IDENTIFIER {$$ = new EnumSpecifierNode(new KeywordNode($1),new IdentifierNode($2));}
 ;
 
 enumerator_list:
-	enumerator |
-	enumerator_list ',' enumerator
+	enumerator {$$ = new EnumeratorListNode($1);}|
+	enumerator_list ',' enumerator{{$1->children.push_back($3); $$ = $1 ;}}
 ;
 
 enumerator: 
-    IDENTIFIER |
-	IDENTIFIER '=' constant_expression
+    IDENTIFIER {$$ = new EnumeratorNode(new IdentifierNode($1));}|
+	IDENTIFIER '=' constant_expression{$$ = new EnumeratorNode(new IdentifierNode($1),$3);}
 ;
 
 type_name:
-	specifier_qualifier_list | 
-    specifier_qualifier_list abstract_declarator
+	specifier_qualifier_list {$$ = new TypeNameNode($1);}| 
+    specifier_qualifier_list abstract_declarator{$$ = new TypeNameNode($1,$2);}
 ;
 
 abstract_declarator:
-	pointer |
-	direct_abstract_declarator |
-	pointer direct_abstract_declarator
+	pointer{$$ = new AbstractDeclaratorNode($1);} |
+	direct_abstract_declarator {$$ = new AbstractDeclaratorNode($1);}|
+	pointer direct_abstract_declarator  {$$ = new AbstractDeclaratorNode($1,$2);}
 ;
 
 direct_abstract_declarator:
-	'(' abstract_declarator ')' |
-	'[' ']' |
-	'[' assignment_expression ']' |
-	direct_abstract_declarator '[' ']' |
-	direct_abstract_declarator '[' assignment_expression ']' |
+	'(' abstract_declarator ')'{$$ = new DirectAbstractDeclaratorNode($2);} |
+	'[' ']' {$$ = new DirectAbstractDeclaratorNode();}|
+	'[' assignment_expression ']' {$$ = new DirectAbstractDeclaratorNode($2);} |
+	direct_abstract_declarator '[' ']'  |
+	direct_abstract_declarator '[' assignment_expression ']'|
 	'[' '*' ']' |
 	direct_abstract_declarator '[' '*' ']' |
 	'(' ')' |
