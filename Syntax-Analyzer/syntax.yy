@@ -741,52 +741,55 @@
     };
 }
 
+
+%define api.value.type union
+
 // Tokens
 
 // Keywords
-%token  <std::string>  AUTO
-%token  <std::string>  BOOL
-%token  <std::string>  BREAK
-%token  <std::string>  CASE
-%token  <std::string>  CHAR
-%token  <std::string>  COMPLEX
-%token  <std::string>  CONST
-%token  <std::string>  CONTINUE
-%token  <std::string>  DEFAULT
-%token  <std::string>  DO
-%token  <std::string>  DOUBLE
-%token  <std::string>  ELSE
-%token  <std::string>  ENUM
-%token  <std::string>  EXTERN
-%token  <std::string>  FLOAT
-%token  <std::string>  FOR
-%token  <std::string>  GOTO
-%token  <std::string>  IF
-%token  <std::string>  IMAGINARY
-%token  <std::string>  INLINE
-%token  <std::string>  INT
-%token  <std::string>  LONG
-%token  <std::string>  REGISTER
-%token  <std::string>  RESTRICT
-%token  <std::string>  RETURN
-%token  <std::string>  SHORT
-%token  <std::string>  SIGNED
-%token  <std::string>  SIZEOF
-%token  <std::string>  STATIC
-%token  <std::string>  STRUCT
-%token  <std::string>  SWITCH
-%token  <std::string>  TYPEDEF
-%token  <std::string>  UNION
-%token  <std::string>  UNSIGNED
-%token  <std::string>  VOID
-%token  <std::string>  VOLATILE
-%token  <std::string>  WHILE
+%token  <string>  AUTO
+%token  <string>  BOOL
+%token  <string>  BREAK
+%token  <string>  CASE
+%token  <string>  CHAR
+%token  <string>  COMPLEX
+%token  <string>  CONST
+%token  <string>  CONTINUE
+%token  <string>  DEFAULT
+%token  <string>  DO
+%token  <string>  DOUBLE
+%token  <string>  ELSE
+%token  <string>  ENUM
+%token  <string>  EXTERN
+%token  <string>  FLOAT
+%token  <string>  FOR
+%token  <string>  GOTO
+%token  <string>  IF
+%token  <string>  IMAGINARY
+%token  <string>  INLINE
+%token  <string>  INT
+%token  <string>  LONG
+%token  <string>  REGISTER
+%token  <string>  RESTRICT
+%token  <string>  RETURN
+%token  <string>  SHORT
+%token  <string>  SIGNED
+%token  <string>  SIZEOF
+%token  <string>  STATIC
+%token  <string>  STRUCT
+%token  <string>  SWITCH
+%token  <string>  TYPEDEF
+%token  <string>  UNION
+%token  <string>  UNSIGNED
+%token  <string>  VOID
+%token  <string>  VOLATILE
+%token  <string>  WHILE
 
-%token <std::string> IDENTIFIER
+%token <string> IDENTIFIER
 
-%token <std::string> LITERAL // Numeric literal
+%token <string> LITERAL // Numeric literal
 
-%token <std::string> STRING_LITERAL  // String literal
+%token <string> STRING_LITERAL  // String literal
 
 // // Delimeters
 // %token ;
@@ -818,63 +821,64 @@
 
 // Delimeters
 
-%token  <std::string>  SEMICOLON ";"
-%token  <std::string>  COMMA ","
-%token  <std::string>  COLON ":"
-%token  <std::string>  LEFT_PAR "("
-%token  <std::string>  RIGHT_PAR ")"
-%token  <std::string>  DOT "."
-%token  <std::string>  LEFT_CBRACKET "{"
-%token  <std::string>  RIGHT_CBRACKET "}"
-%token  <std::string>  LEFT_BRACKET "["
-%token  <std::string>  RIGHT_BRACKET "]"
+%token  <string>  SEMICOLON ";"
+%token  <string>  COMMA ","
+%token  <string>  COLON ":"
+%token  <string>  LEFT_PAR "("
+%token  <string>  RIGHT_PAR ")"
+%token  <string>  DOT "."
+%token  <string>  LEFT_CBRACKET "{"
+%token  <string>  RIGHT_CBRACKET "}"
+%token  <string>  LEFT_BRACKET "["
+%token  <string>  RIGHT_BRACKET "]"
 
 // Operators
 
-%token  <std::string>  ASSIGN_OP "="
-%token  <std::string>  AMP "&"
-%token  <std::string>  LOG_NOT_OP "!"
-%token  <std::string>  BIN_NOT_OP "~"
-%token  <std::string>  MINUS "-"
-%token  <std::string>  PLUS "+"
-%token  <std::string>  STAR "*"
-%token  <std::string>  SLASH "/"
-%token  <std::string>  MOD_OP "%"
-%token  <std::string>  G_OP "<"
-%token  <std::string>  L_OP ">"
-%token  <std::string>  BIN_XOR_OP "^"
-%token  <std::string>  BIN_OR_OP "|"
-%token  <std::string>  TERNARY_OP "?"
+%token  <string>  ASSIGN_OP "="
+%token  <string>  AMP "&"
+%token  <string>  LOG_NOT_OP "!"
+%token  <string>  BIN_NOT_OP "~"
+%token  <string>  MINUS "-"
+%token  <string>  PLUS "+"
+%token  <string>  STAR "*"
+%token  <string>  SLASH "/"
+%token  <string>  MOD_OP "%"
+%token  <string>  G_OP "<"
+%token  <string>  L_OP ">"
+%token  <string>  BIN_XOR_OP "^"
+%token  <string>  BIN_OR_OP "|"
+%token  <string>  TERNARY_OP "?"
 
 
-%token  <std::string>  ELLIPSIS "..."
-%token  <std::string>  RIGHT_ASSIGN ">>="
-%token  <std::string>  LEFT_ASSIGN "<<="
-%token  <std::string>  ADD_ASSIGN "+="
-%token  <std::string>  SUB_ASSIGN "-="
-%token  <std::string>  MUL_ASSIGN "*="
-%token  <std::string>  DIV_ASSIGN "/="
-%token  <std::string>  MOD_ASSIGN "%="
-%token  <std::string>  AND_ASSIGN "&="
-%token  <std::string>  XOR_ASSIGN "^="
-%token  <std::string>  OR_ASSIGN "|="
-%token  <std::string>  RIGHT_OP ">>"
-%token  <std::string>  LEFT_OP "<<"
-%token  <std::string>  INC_OP "++"
-%token  <std::string>  DEC_OP "--"
-%token  <std::string>  PTR_OP "->"
-%token  <std::string>  AND_OP "&&"
-%token  <std::string>  OR_OP "||"
-%token  <std::string>  LE_OP "<="
-%token  <std::string>  GE_OP ">="
-%token  <std::string>  EQ_OP "=="
-%token  <std::string>  NE_OP "!="
+%token  <string>  ELLIPSIS "..."
+%token  <string>  RIGHT_ASSIGN ">>="
+%token  <string>  LEFT_ASSIGN "<<="
+%token  <string>  ADD_ASSIGN "+="
+%token  <string>  SUB_ASSIGN "-="
+%token  <string>  MUL_ASSIGN "*="
+%token  <string>  DIV_ASSIGN "/="
+%token  <string>  MOD_ASSIGN "%="
+%token  <string>  AND_ASSIGN "&="
+%token  <string>  XOR_ASSIGN "^="
+%token  <string>  OR_ASSIGN "|="
+%token  <string>  RIGHT_OP ">>"
+%token  <string>  LEFT_OP "<<"
+%token  <string>  INC_OP "++"
+%token  <string>  DEC_OP "--"
+%token  <string>  PTR_OP "->"
+%token  <string>  AND_OP "&&"
+%token  <string>  OR_OP "||"
+%token  <string>  LE_OP "<="
+%token  <string>  GE_OP ">="
+%token  <string>  EQ_OP "=="
+%token  <string>  NE_OP "!="
 
 %start translation_unit
 // %start primary_expression
 
 // Grammar
 %%
+
 
 %type <Node*> primary_expression;
 %type <Node*> postfix_expression;
