@@ -673,7 +673,7 @@ direct_declarator:
         { $$ = new Node("DIRECT_DECLARATOR_NODE", vector<Node*>{ $1, $3, new Node("STATIC", $4), $5 }); }
 
 	| direct_declarator LEFT_BRACKET type_qualifier_list STAR RIGHT_BRACKET
-        { $$ = new Node("DIRECT_DECLARATOR_NODE", vector<Node*>{ $1, $3, new Node("STAR", $6) }); }
+        { $$ = new Node("DIRECT_DECLARATOR_NODE", vector<Node*>{ $1, $3, new Node("STAR", $4) }); }
 
 	| direct_declarator LEFT_BRACKET STAR RIGHT_BRACKET
         { $$ = new Node("DIRECT_DECLARATOR_NODE", vector<Node*>{ $1, new Node("STAR", $3) }); }
@@ -733,10 +733,10 @@ parameter_list:
 
 parameter_declaration:
 	declaration_specifiers declarator
-        { $$ = new Node("PARAMETER_DECLARATION_NODE", vector<Node*>{ $1, $3 }); }
+        { $$ = new Node("PARAMETER_DECLARATION_NODE", vector<Node*>{ $1, $2 }); }
 
 	| declaration_specifiers abstract_declarator
-        { $$ = new Node("PARAMETER_DECLARATION_NODE", vector<Node*>{ $1, $3 }); }
+        { $$ = new Node("PARAMETER_DECLARATION_NODE", vector<Node*>{ $1, $2 }); }
 
 	| declaration_specifiers
         { $$ = new Node("PARAMETER_DECLARATION_NODE", vector<Node*>{ $1 }); }
@@ -751,379 +751,379 @@ function_specifier:
 
 type_specifier:
 	VOID
-
+        { $$ = new Node("TYPE_SPECIFIER_NODE", vector<Node*>{ new Node("VOID", $1) }); }
 
 	| CHAR
-
+        { $$ = new Node("TYPE_SPECIFIER_NODE", vector<Node*>{ new Node("CHAR", $1) }); }
 
 	| SHORT
-
+        { $$ = new Node("TYPE_SPECIFIER_NODE", vector<Node*>{ new Node("SHORT", $1) }); }
 
 	| INT
-
+        { $$ = new Node("TYPE_SPECIFIER_NODE", vector<Node*>{ new Node("INT", $1) }); }
 
 	| LONG
-
+        { $$ = new Node("TYPE_SPECIFIER_NODE", vector<Node*>{ new Node("LONG", $1) }); }
 
 	| FLOAT
-
+        { $$ = new Node("TYPE_SPECIFIER_NODE", vector<Node*>{ new Node("FLOAT", $1) }); }
 
 	| DOUBLE
-
+        { $$ = new Node("TYPE_SPECIFIER_NODE", vector<Node*>{ new Node("DOUBLE", $1) }); }
 
 	| SIGNED
-
+        { $$ = new Node("TYPE_SPECIFIER_NODE", vector<Node*>{ new Node("SIGNED", $1) }); }
 
 	| UNSIGNED
-
+        { $$ = new Node("TYPE_SPECIFIER_NODE", vector<Node*>{ new Node("UNSIGNED", $1) }); }
 
 	| BOOL
-
+        { $$ = new Node("TYPE_SPECIFIER_NODE", vector<Node*>{ new Node("BOOL", $1) }); }
 
 	| COMPLEX
-
+        { $$ = new Node("TYPE_SPECIFIER_NODE", vector<Node*>{ new Node("COMPLEX", $1) }); }
 
 	| IMAGINARY
-
+        { $$ = new Node("TYPE_SPECIFIER_NODE", vector<Node*>{ new Node("IMAGINARY", $1) }); }
 
 	| struct_or_union_specifier
-
+        { $$ = new Node("TYPE_SPECIFIER_NODE", vector<Node*>{ $1 }); }
 
 	| enum_specifier
-
+        { $$ = new Node("TYPE_SPECIFIER_NODE", vector<Node*>{ $1 }); }
 
 	| type_name
-
+        { $$ = new Node("TYPE_SPECIFIER_NODE", vector<Node*>{ $1 }); }
 ;
 
 
 struct_or_union_specifier:
 	struct_or_union IDENTIFIER LEFT_CBRACKET struct_declaration_list RIGHT_CBRACKET
-
+        { $$ = new Node("STRUCT_OR_UNION_SPECIFIER_NODE", vector<Node*>{ $1, new Node("IDENTIFIER", $2), $4 }); }
 
 	| struct_or_union LEFT_CBRACKET struct_declaration_list RIGHT_CBRACKET
-
+        { $$ = new Node("STRUCT_OR_UNION_SPECIFIER_NODE", vector<Node*>{ $1, $3 }); }
 
 	| struct_or_union IDENTIFIER
-
+        { $$ = new Node("STRUCT_OR_UNION_SPECIFIER_NODE", vector<Node*>{ $1, new Node("IDENTIFIER", $2) }); }
 ;
 
 
 struct_or_union:
 	STRUCT
-
+        { $$ = new Node("STRUCT_OR_UNION_NODE", vector<Node*>{ new Node("STRUCT", $1) }); }
 
 	| UNION
-
+        { $$ = new Node("STRUCT_OR_UNION_NODE", vector<Node*>{ new Node("UNION", $1) }); }
 ;
 
 
 struct_declaration_list:
 	struct_declaration
-
+        { $$ = new Node("STRUCT_DECLARATION_LIST_NODE", vector<Node*>{ $1 }); }
 
 	| struct_declaration_list struct_declaration
-
+        { $$ = new Node("STRUCT_DECLARATION_LIST_NODE", vector<Node*>{ $1, $2 }); }
 ;
 
 
 struct_declaration:
 	specifier_qualifier_list struct_declarator_list SEMICOLON
-
+        { $$ = new Node("STRUCT_DECLARATION_NODE", vector<Node*>{ $1, $2 }); }
 ;
 
 
 struct_declarator_list:
 	struct_declarator
-
+        { $$ = new Node("STRUCT_DECLARATOR_LIST_NODE", vector<Node*>{ $1 }); }
 
 	| struct_declarator_list COMMA struct_declarator
-
+        { $$ = new Node("STRUCT_DECLARATOR_LIST_NODE", vector<Node*>{ $1, $3 }); }
 ;
 
 
 struct_declarator:
 	declarator
-
+        { $$ = new Node("STRUCT_DECLARATOR_NODE", vector<Node*>{ $1 }); }
 
 	| COLON constant_expression
-
+        { $$ = new Node("STRUCT_DECLARATOR_NODE", vector<Node*>{ $2 }); }
 
 	| declarator COLON constant_expression
-
+        { $$ = new Node("STRUCT_DECLARATOR_NODE", vector<Node*>{ $1, $3 }); }
 ;
 
 
 specifier_qualifier_list:
 	type_specifier specifier_qualifier_list
-
+        { $$ = new Node("SPECIFIER_QUALIFIER_LIST_NODE", vector<Node*>{ $1, $2 }); }
 
 	| type_specifier
-
+        { $$ = new Node("SPECIFIER_QUALIFIER_LIST_NODE", vector<Node*>{ $1 }); }
 
 	| type_qualifier specifier_qualifier_list
-
+        { $$ = new Node("SPECIFIER_QUALIFIER_LIST_NODE", vector<Node*>{ $1, $2 }); }
 
 	| type_qualifier
-
+        { $$ = new Node("SPECIFIER_QUALIFIER_LIST_NODE", vector<Node*>{ $1 }); }
 ;
 
 
 enum_specifier: 
     ENUM LEFT_CBRACKET enumerator_list RIGHT_CBRACKET
-
+        { $$ = new Node("ENUM_SPECIFIER_NODE", vector<Node*>{ new Node("ENUM", $1), $3 }); }
 
 	| ENUM IDENTIFIER LEFT_CBRACKET enumerator_list RIGHT_CBRACKET
-
+        { $$ = new Node("ENUM_SPECIFIER_NODE", vector<Node*>{ new Node("ENUM", $1), new Node("IDENTIFIER", $2), $4 }); }
 
 	| LEFT_CBRACKET enumerator_list COMMA RIGHT_CBRACKET
-
+        { $$ = new Node("ENUM_SPECIFIER_NODE", vector<Node*>{ $2 }); }
 
 	| ENUM IDENTIFIER LEFT_CBRACKET enumerator_list COMMA RIGHT_CBRACKET
-
+        { $$ = new Node("ENUM_SPECIFIER_NODE", vector<Node*>{ new Node("ENUM", $1), new Node("IDENTIFIER", $2), $4 }); }
 
 	| ENUM IDENTIFIER
-
+        { $$ = new Node("ENUM_SPECIFIER_NODE", vector<Node*>{ new Node("ENUM", $1), new Node("IDENTIFIER", $2) }); }
 ;
 
 
 enumerator_list:
 	enumerator
-
+        { $$ = new Node("ENUMERATOR_LIST_NODE", vector<Node*>{ $1 }); }
 
 	| enumerator_list COMMA enumerator
-
+        { $$ = new Node("ENUMERATOR_LIST_NODE", vector<Node*>{ $1, $3 }); }
 ;
 
 
 enumerator: 
     IDENTIFIER
-
+        { $$ = new Node("ENUMERATOR_NODE", vector<Node*>{ $1 }); }
 
 	| IDENTIFIER ASSIGN_OP constant_expression
-
+        { $$ = new Node("ENUMERATOR_NODE", vector<Node*>{ new Node("IDENTIFIER", $1), new Node("ASSIGN_OP", $2), $3 }); }
 ;
 
 
 type_name:
 	specifier_qualifier_list
-
+        { $$ = new Node("TYPE_NAME_NODE", vector<Node*>{ $1 }); }
 
 	| specifier_qualifier_list abstract_declarator
-
+        { $$ = new Node("TYPE_NAME_NODE", vector<Node*>{ $1, $2 }); }
 ;
 
 
 abstract_declarator:
 	pointer
-
+        { $$ = new Node("ABSTRACT_DECLARATOR_NODE", vector<Node*>{ $1 }); }
 
 	| direct_abstract_declarator
-
+        { $$ = new Node("ABSTRACT_DECLARATOR_NODE", vector<Node*>{ $1 }); }
 
 	| pointer direct_abstract_declarator
-
+        { $$ = new Node("ABSTRACT_DECLARATOR_NODE", vector<Node*>{ $1, $2 }); }
 ;
 
 
 direct_abstract_declarator:
 	LEFT_PAR abstract_declarator RIGHT_PAR
-
+        { $$ = new Node("DIRECT_ABSTRACT_DECLARATOR_NODE", vector<Node*>{ $2 }); }
 
 	| LEFT_BRACKET RIGHT_BRACKET
-
+        { $$ = new Node("DIRECT_ABSTRACT_DECLARATOR_NODE", vector<Node*>{}); }
 
 	| LEFT_BRACKET assignment_expression RIGHT_BRACKET
-
+        { $$ = new Node("DIRECT_ABSTRACT_DECLARATOR_NODE", vector<Node*>{ $2 }); }
 
 	| direct_abstract_declarator LEFT_BRACKET RIGHT_BRACKET
-
+        { $$ = new Node("DIRECT_ABSTRACT_DECLARATOR_NODE", vector<Node*>{ $1 }); }
 
 	| direct_abstract_declarator LEFT_BRACKET assignment_expression RIGHT_BRACKET
-
+        { $$ = new Node("DIRECT_ABSTRACT_DECLARATOR_NODE", vector<Node*>{ $1, $3 }); }
 
 	| LEFT_BRACKET STAR RIGHT_BRACKET
-
+        { $$ = new Node("DIRECT_ABSTRACT_DECLARATOR_NODE", vector<Node*>{ new Node("STAR", $2) }); }
 
 	| direct_abstract_declarator LEFT_BRACKET STAR RIGHT_BRACKET
-
+        { $$ = new Node("DIRECT_ABSTRACT_DECLARATOR_NODE", vector<Node*>{ $1, new Node("STAR", $3) }); }
 
 	| LEFT_PAR RIGHT_PAR
-
+        { $$ = new Node("DIRECT_ABSTRACT_DECLARATOR_NODE", vector<Node*>{}); }
 
 	| LEFT_PAR parameter_type_list RIGHT_PAR
-
+        { $$ = new Node("DIRECT_ABSTRACT_DECLARATOR_NODE", vector<Node*>{ $2 }); }
 
 	| direct_abstract_declarator LEFT_PAR RIGHT_PAR
-
+        { $$ = new Node("DIRECT_ABSTRACT_DECLARATOR_NODE", vector<Node*>{ $1 }); }
 
 	| direct_abstract_declarator LEFT_PAR parameter_type_list RIGHT_PAR
-
+        { $$ = new Node("DIRECT_ABSTRACT_DECLARATOR_NODE", vector<Node*>{ $1, $3 }); }
 ;
 
 
 statement:
 	labeled_statement
-
+        { $$ = new Node("STATEMENT_NODE", vector<Node*>{ $1 }); }
 
 	| compound_statement
-
+        { $$ = new Node("STATEMENT_NODE", vector<Node*>{ $1 }); }
 
 	| expression_statement
-
+        { $$ = new Node("STATEMENT_NODE", vector<Node*>{ $1 }); }
 
 	| selection_statement
-
+        { $$ = new Node("STATEMENT_NODE", vector<Node*>{ $1 }); }
 
 	| iteration_statement
-
+        { $$ = new Node("STATEMENT_NODE", vector<Node*>{ $1 }); }
 
 	| jump_statement
-
+        { $$ = new Node("STATEMENT_NODE", vector<Node*>{ $1 }); }
 ;
 
 
 labeled_statement:
 	IDENTIFIER COLON statement
-
+        { $$ = new Node("LABELED_STATEMENT_NODE", vector<Node*>{ new Node("IDENTIFIER", $1), $3 }); }
 
 	| CASE constant_expression COLON statement
-
+        { $$ = new Node("LABELED_STATEMENT_NODE", vector<Node*>{ new Node("CASER", $1), $2, $4 }); }
 
 	| DEFAULT COLON statement
-
+        { $$ = new Node("LABELED_STATEMENT_NODE", vector<Node*>{ new Node("DEFAULT", $1), $3 }); }
 ;
 
 
 compound_statement:
 	LEFT_CBRACKET RIGHT_CBRACKET
-
+        { $$ = new Node("COMPOUND_STATEMENT_NODE", vector<Node*>{}); }
 
 	| LEFT_CBRACKET block_item_list RIGHT_CBRACKET
-
+        { $$ = new Node("COMPOUND_STATEMENT_NODE", vector<Node*>{ $2 }); }
 ;
 
 
 block_item_list:
 	block_item
-
+        { $$ = new Node("BLOCK_ITEM_LIST_NODE", vector<Node*>{ $1 }); }
 
 	| block_item_list block_item
-
+        { $$ = new Node("BLOCK_ITEM_LIST_NODE", vector<Node*>{ $1, $2 }); }
 ;
 
 
 block_item:
 	declaration
-
+        { $$ = new Node("BLOCK_ITEM_NODE", vector<Node*>{ $1 }); }
 
 	| statement
-
+        { $$ = new Node("BLOCK_ITEM_NODE", vector<Node*>{ $1 }); }
 ;
 
 
 expression_statement:
 	SEMICOLON
-
+        { $$ = new Node("EXPRESSION_STATEMENT_NODE", vector<Node*>{}); }
 
 	| expression SEMICOLON
-
+        { $$ = new Node("EXPRESSION_STATEMENT_NODE", vector<Node*>{ $1 }); }
 ;
 
 
 selection_statement:
 	IF LEFT_PAR expression RIGHT_PAR statement
-
+        { $$ = new Node("SELECTION_STATEMENT_NODE", vector<Node*>{ new Node("IF", $1), $3, $5 }); }
 
 	| IF LEFT_PAR expression RIGHT_PAR statement ELSE statement
-
+        { $$ = new Node("SELECTION_STATEMENT_NODE", vector<Node*>{ new Node("IF", $1), $3, $5, new Node("ELSE", $6), $7 }); }
 
 	| SWITCH LEFT_PAR expression RIGHT_PAR statement
-
+        { $$ = new Node("SELECTION_STATEMENT_NODE", vector<Node*>{ new Node("SWITCH", $1), $3, $5 }); }
 ;
 
 
 iteration_statement:
 	WHILE LEFT_PAR expression RIGHT_PAR statement
-
+        { $$ = new Node("ITERATION_STATEMENT_NODE", vector<Node*>{ new Node("WHILE", $1), $3, $5 }); }
 
 	| DO statement WHILE LEFT_PAR expression RIGHT_PAR SEMICOLON
-
+        { $$ = new Node("ITERATION_STATEMENT_NODE", vector<Node*>{ new Node("DO", $1), $2, new Node("WHILE", $3), $5 }); }
 
 	| FOR LEFT_PAR expression_statement expression_statement RIGHT_PAR statement
-
+        { $$ = new Node("ITERATION_STATEMENT_NODE", vector<Node*>{ new Node("FOR", $1), $3, $4, $6 }); }
 
 	| FOR LEFT_PAR expression_statement expression_statement expression RIGHT_PAR statement
-
+        { $$ = new Node("ITERATION_STATEMENT_NODE", vector<Node*>{ new Node("FOR", $1), $3, $4, $5, $7 }); }
 
 	| FOR LEFT_PAR declaration expression_statement RIGHT_PAR statement
-
+        { $$ = new Node("ITERATION_STATEMENT_NODE", vector<Node*>{ new Node("FOR", $1), $3, $4, $6 }); }
 
 	| FOR LEFT_PAR declaration expression_statement expression RIGHT_PAR statement
-
+        { $$ = new Node("ITERATION_STATEMENT_NODE", vector<Node*>{ new Node("FOR", $1), $3, $4, $5, $7 }); }
 ;
 
 
 jump_statement: 
 	GOTO IDENTIFIER SEMICOLON
-
+        { $$ = new Node("JUMP_STATEMENT_NODE", vector<Node*>{ new Node("GOTO", $1), new Node("IDENTIFIER", $2) }); }
 
 	| CONTINUE SEMICOLON
-
+        { $$ = new Node("JUMP_STATEMENT_NODE", vector<Node*>{ new Node("CONTINUE", $1) }); }
 
 	| BREAK SEMICOLON
-
+        { $$ = new Node("JUMP_STATEMENT_NODE", vector<Node*>{ new Node("BREAK", $1) }); }
 
 	| RETURN SEMICOLON
-
+        { $$ = new Node("JUMP_STATEMENT_NODE", vector<Node*>{ new Node("RETURN", $1) }); }
 
 	| RETURN expression SEMICOLON
-
+        { $$ = new Node("JUMP_STATEMENT_NODE", vector<Node*>{ new Node("RETURN", $1), $2 }); }
 ;
 
 
 translation_unit:
 	external_declaration
-
+        { $$ = new Node("TRANSLATION_UNIT_NODE", vector<Node*>{ $1 }); }
 
 	| translation_unit external_declaration
-
+        { $$ = new Node("TRANSLATION_UNIT_NODE", vector<Node*>{ $1, $2 }); }
 ;
 
 
 external_declaration:
 	function_definition
-
+        { $$ = new Node("EXTERNAL_DECLARATION_NODE", vector<Node*>{ $1 }); }
 
 	| declaration
-
+        { $$ = new Node("EXTERNAL_DECLARATION_NODE", vector<Node*>{ $1 }); }
 ;
 
 
 function_definition:
 	declaration_specifiers declarator declaration_list compound_statement
-
+        { $$ = new Node("FUNCTION_DEFINITION_NODE", vector<Node*>{ $1, $2, $3, $4 }); }
 
 	| declaration_specifiers declarator compound_statement
-
+        { $$ = new Node("FUNCTION_DEFINITION_NODE", vector<Node*>{ $1, $2, $3 }); }
 ;
 
 
 declaration_list: 
     declaration
-
+        { $$ = new Node("DECLARATION_LIST_NODE", vector<Node*>{ $1 }); }
 
 	| declaration_list declaration
-
+        { $$ = new Node("DECLARATION_LIST_NODE", vector<Node*>{ $1, $2 }); }
 ;
 
 
 identifier_list:
 	IDENTIFIER
-
+        { $$ = new Node("IDENTIFIER_LIST_NODE", vector<Node*>{ new Node("IDENTIFIER", $1) }); }
 
 	| identifier_list COMMA IDENTIFIER
-
+        { $$ = new Node("IDENTIFIER_LIST_NODE", vector<Node*>{ $1, new Node("IDENTIFIER", $3) }); }
 ;
 
 
