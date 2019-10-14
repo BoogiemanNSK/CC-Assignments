@@ -1,6 +1,7 @@
 %language "c++"
 
-%code top {
+%code
+{
     #include <vector>
     #include <string>
     #include <iostream> 
@@ -1130,9 +1131,15 @@ identifier_list:
 %%
 
 // Epilogue
-
 namespace yy
-
+{
+  // Report an error to the user.
+  auto parser::error (const std::string& msg) -> void
+  {
+    std::cerr << msg << '\n';
+  }
+}
+    
 int main () {
     yy::parser parse;
     return parse ();
