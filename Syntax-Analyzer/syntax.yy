@@ -5,8 +5,6 @@
     #include <vector>
     #include <string>
     #include <iostream> 
-    #include "syntax.tab.cc"
-    #include "stack.hh"
 
     using namespace std;
 
