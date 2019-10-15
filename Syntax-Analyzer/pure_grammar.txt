@@ -1,0 +1,439 @@
+
+primary_expression:
+      IDENTIFIER            
+    | LITERAL               
+    | STRING_LITERAL        
+    | LEFT_PAR expression RIGHT_PAR    
+;
+
+postfix_expression:
+      primary_expression 
+    | postfix_expression LEFT_BRACKET expression RIGHT_BRACKET 
+    | postfix_expression LEFT_PAR argument_expression_list RIGHT_PAR
+    | postfix_expression LEFT_PAR RIGHT_PAR
+    | postfix_expression DOT IDENTIFIER 
+    | postfix_expression PTR_OP IDENTIFIER 
+    | postfix_expression INC_OP 
+    | postfix_expression DEC_OP 
+    | LEFT_PAR type_name RIGHT_PAR LEFT_CBRACKET initializer_list RIGHT_CBRACKET 
+    | LEFT_PAR type_name RIGHT_PAR LEFT_CBRACKET initializer_list COMMA RIGHT_CBRACKET 
+;
+
+argument_expression_list:
+      IDENTIFIER
+    | IDENTIFIER COMMA argument_expression_list 
+;
+
+unary_expression:
+      postfix_expression 
+    | INC_OP unary_expression 
+    | DEC_OP unary_expression 
+    | unary_operator cast_expression 
+    | SIZEOF unary_expression 
+    | SIZEOF LEFT_PAR type_name RIGHT_PAR 
+;
+
+unary_operator:
+      AMP
+    | STAR
+    | PLUS
+    | MINUS
+    | BIN_NOT_OP
+    | LOG_NOT_OP
+;
+
+cast_expression:
+      unary_expression 
+    | LEFT_PAR type_name RIGHT_PAR cast_expression 
+;
+
+multiplicative_expression:
+      cast_expression 
+    | multiplicative_expression STAR cast_expression 
+    | multiplicative_expression SLASH cast_expression 
+    | multiplicative_expression MOD_OP cast_expression 
+;
+
+additive_expression:
+      multiplicative_expression 
+    | additive_expression PLUS multiplicative_expression 
+    | additive_expression MINUS multiplicative_expression 
+;
+
+shift_expression:
+      additive_expression 
+    | shift_expression LEFT_OP additive_expression 
+    | shift_expression RIGHT_OP additive_expression 
+;
+
+relational_expression:
+      shift_expression 
+    | relational_expression L_OP shift_expression 
+    | relational_expression G_OP shift_expression 
+    | relational_expression LE_OP shift_expression 
+    | relational_expression GE_OP shift_expression 
+;
+
+equality_expression:
+      relational_expression 
+    | equality_expression EQ_OP relational_expression 
+    | equality_expression NE_OP relational_expression 
+;
+
+and_expression:
+      equality_expression 
+    | and_expression AMP equality_expression 
+;
+
+exclusive_or_expression:
+      and_expression 
+    | exclusive_or_expression BIN_XOR_OP and_expression 
+;
+
+inclusive_or_expression:
+      exclusive_or_expression 
+    | inclusive_or_expression BIN_OR_OP exclusive_or_expression 
+;
+
+logical_and_expression:
+      inclusive_or_expression 
+    | logical_and_expression AND_OP inclusive_or_expression 
+;
+
+logical_or_expression: 
+      logical_and_expression 
+    | logical_or_expression OR_OP logical_and_expression 
+;
+
+conditional_expression:
+      logical_or_expression 
+    | logical_or_expression TERNARY_OP expression COLON conditional_expression 
+;
+
+assignment_expression:
+      conditional_expression 
+    | unary_expression assignment_operator assignment_expression 
+;
+
+assignment_operator:
+      ASSIGN_OP  
+    | MUL_ASSIGN 
+    | DIV_ASSIGN 
+    | MOD_ASSIGN 
+    | ADD_ASSIGN 
+    | SUB_ASSIGN 
+    | LEFT_ASSIGN 
+    | RIGHT_ASSIGN 
+    | AND_ASSIGN 
+    | XOR_ASSIGN 
+    | OR_ASSIGN 
+;
+
+expression:
+      assignment_expression 
+    | expression COMMA assignment_expression 
+;
+
+
+constant_expression:
+    conditional_expression 
+;
+
+declaration:
+    declaration_specifiers SEMICOLON |
+	declaration_specifiers init_declarator_list SEMICOLON 
+;
+
+declaration_specifiers: 
+    storage_class_specifier |
+	storage_class_specifier declaration_specifiers |
+	type_specifier  |
+	type_specifier declaration_specifiers |
+	type_qualifier  |
+	type_qualifier declaration_specifiers  |
+    function_specifier  |
+	function_specifier declaration_specifiers 
+;
+storage_class_specifier:
+	EXTERN   |
+	STATIC   |
+	AUTO  |
+	REGISTER  
+;
+
+init_declarator_list:
+	init_declarator |   
+	init_declarator_list COMMA init_declarator
+;
+
+init_declarator:
+	declarator |
+	declarator ASSIGN_OP initializer 
+;
+
+initializer:
+	assignment_expression  |
+	LEFT_CBRACKET initializer_list RIGHT_CBRACKET |
+	LEFT_CBRACKET initializer_list COMMA RIGHT_CBRACKET 
+;
+
+initializer_list:
+	initializer  |
+	designation initializer    |
+	initializer_list COMMA initializer  |
+	initializer_list COMMA designation initializer
+;
+
+designation:
+	designator_list ASSIGN_OP 
+;
+
+designator_list:
+	designator |
+	designator_list designator
+;
+
+designator:
+	LEFT_BRACKET constant_expression RIGHT_BRACKET  |
+	DOT IDENTIFIER
+;
+
+declarator: 
+    pointer direct_declarator |
+	direct_declarator 
+;
+
+pointer:
+	STAR |
+	STAR type_qualifier_list |
+	STAR pointer |
+	STAR type_qualifier_list pointer 
+;
+
+direct_declarator: 
+    IDENTIFIER |
+	LEFT_PAR declarator RIGHT_PAR |
+	direct_declarator LEFT_BRACKET type_qualifier_list assignment_expression RIGHT_BRACKET |
+	direct_declarator LEFT_BRACKET type_qualifier_list RIGHT_BRACKET |
+	direct_declarator LEFT_BRACKET assignment_expression RIGHT_BRACKET |
+	direct_declarator LEFT_BRACKET STATIC type_qualifier_list assignment_expression RIGHT_BRACKET |
+	direct_declarator LEFT_BRACKET type_qualifier_list STATIC assignment_expression RIGHT_BRACKET |
+	direct_declarator LEFT_BRACKET type_qualifier_list STAR RIGHT_BRACKET |
+	direct_declarator LEFT_BRACKET STAR RIGHT_BRACKET  |
+	direct_declarator LEFT_BRACKET RIGHT_BRACKET |
+	direct_declarator LEFT_PAR parameter_type_list RIGHT_PAR |
+	direct_declarator LEFT_PAR identifier_list RIGHT_PAR |
+	direct_declarator LEFT_PAR RIGHT_PAR
+;
+
+type_qualifier_list:
+    type_qualifier  |
+	type_qualifier_list type_qualifier
+;
+
+type_qualifier:
+	CONST |
+	RESTRICT  |
+	VOLATILE 
+;
+parameter_type_list: 
+    parameter_list |
+	parameter_list COMMA ELLIPSIS
+;
+
+parameter_list:
+	parameter_declaration SEMICOLON |
+	parameter_list COMMA parameter_declaration
+;
+
+parameter_declaration:
+	declaration_specifiers declarator |
+	declaration_specifiers abstract_declarator  |
+	declaration_specifiers
+;
+function_specifier: 
+    INLINE
+;
+type_specifier:
+	VOID |
+	CHAR |
+	SHORT |
+	INT |
+	LONG |
+	FLOAT |
+	DOUBLE |
+	SIGNED |
+	UNSIGNED |
+	BOOL |
+	COMPLEX |
+	IMAGINARY |
+	struct_or_union_specifier  |
+	enum_specifier |
+	type_name
+;
+
+struct_or_union_specifier:
+	struct_or_union IDENTIFIER LEFT_CBRACKET struct_declaration_list RIGHT_CBRACKET |
+	struct_or_union LEFT_CBRACKET struct_declaration_list RIGHT_CBRACKET |
+	struct_or_union IDENTIFIER 
+;
+
+struct_or_union:
+	STRUCT |
+	UNION
+;
+
+struct_declaration_list:
+	struct_declaration|
+	struct_declaration_list struct_declaration 
+;
+
+struct_declaration:
+	specifier_qualifier_list struct_declarator_list SEMICOLON
+;
+
+struct_declarator_list:
+	struct_declarator |
+	struct_declarator_list COMMA struct_declarator 
+;
+
+struct_declarator:
+	declarator |
+	COLON constant_expression |
+	declarator COLON constant_expression}
+;
+
+specifier_qualifier_list:
+	type_specifier specifier_qualifier_list  |
+	type_specifier|
+	type_qualifier specifier_qualifier_list |
+	type_qualifier
+;
+
+
+enum_specifier: 
+    ENUM LEFT_CBRACKET enumerator_list RIGHT_CBRACKET |
+	ENUM IDENTIFIER LEFT_CBRACKET enumerator_list RIGHT_CBRACKET  |
+	ENUM LEFT_CBRACKET enumerator_list COMMA RIGHT_CBRACKET  |
+	ENUM IDENTIFIER LEFT_CBRACKET enumerator_list COMMA RIGHT_CBRACKET  |
+	ENUM IDENTIFIER 
+;
+
+enumerator_list:
+	enumerator |
+	enumerator_list COMMA enumerator}
+;
+
+enumerator: 
+    IDENTIFIER |
+	IDENTIFIER ASSIGN_OP constant_expression
+;
+
+type_name:
+	specifier_qualifier_list | 
+    specifier_qualifier_list abstract_declarator
+;
+
+abstract_declarator:
+	pointer  |
+	direct_abstract_declarator |
+	pointer direct_abstract_declarator 
+;
+
+direct_abstract_declarator:
+	LEFT_PAR abstract_declarator RIGHT_PAR  |
+	LEFT_BRACKET RIGHT_BRACKET |
+	LEFT_BRACKET assignment_expression RIGHT_BRACKET  |
+	direct_abstract_declarator LEFT_BRACKET RIGHT_BRACKET  |
+	direct_abstract_declarator LEFT_BRACKET assignment_expression RIGHT_BRACKET  |
+	LEFT_BRACKET STAR RIGHT_BRACKET  |
+	direct_abstract_declarator LEFT_BRACKET STAR RIGHT_BRACKET  |
+	LEFT_PAR RIGHT_PAR  |
+	LEFT_PAR parameter_type_list RIGHT_PAR  |
+	direct_abstract_declarator LEFT_PAR RIGHT_PAR  |
+	direct_abstract_declarator LEFT_PAR parameter_type_list RIGHT_PAR 
+;
+
+statement:
+	labeled_statement  |
+	compound_statement  |
+	expression_statement  |
+	selection_statement  | 
+	iteration_statement  |
+	jump_statement 
+;
+
+labeled_statement:
+	IDENTIFIER COLON statement  |
+	CASE constant_expression COLON statement  |
+	DEFAULT COLON statement 
+;
+
+compound_statement:
+	LEFT_CBRACKET RIGHT_CBRACKET  |
+	LEFT_CBRACKET block_item_list RIGHT_CBRACKET 
+;
+
+block_item_list:
+	block_item  |
+	block_item_list block_item 
+;
+
+block_item:
+	declaration  |
+	statement 
+;
+
+expression_statement:
+	SEMICOLON  |
+	expression SEMICOLON 
+;
+
+selection_statement:
+	IF LEFT_PAR expression RIGHT_PAR statement  |
+    IF LEFT_PAR expression RIGHT_PAR statement ELSE statement  |
+	SWITCH LEFT_PAR expression RIGHT_PAR statement 
+;
+
+iteration_statement:
+	WHILE LEFT_PAR expression RIGHT_PAR statement  |
+	DO statement WHILE LEFT_PAR expression RIGHT_PAR SEMICOLON  |
+	FOR LEFT_PAR expression_statement expression_statement RIGHT_PAR statement  |
+	FOR LEFT_PAR expression_statement expression_statement expression RIGHT_PAR statement  |
+	FOR LEFT_PAR declaration expression_statement RIGHT_PAR statement  |
+	FOR LEFT_PAR declaration expression_statement expression RIGHT_PAR statement 
+;
+
+jump_statement: 
+	GOTO IDENTIFIER SEMICOLON  |
+	CONTINUE SEMICOLON  |
+	BREAK SEMICOLON  | 
+	RETURN SEMICOLON  |
+    RETURN expression SEMICOLON 
+;
+
+translation_unit:
+	external_declaration  |
+	translation_unit external_declaration 
+;
+
+external_declaration:
+	function_definition  |
+	declaration 
+;
+
+function_definition:
+	declaration_specifiers declarator declaration_list compound_statement  |
+	declaration_specifiers declarator compound_statement 
+;
+
+declaration_list: 
+    declaration 
+  | declaration_list declaration 
+;
+
+identifier_list:
+    IDENTIFIER 
+  | identifier_list COMMA IDENTIFIER 
+;
+
