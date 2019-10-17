@@ -1,19 +1,18 @@
 %language "c++"
 
-%code provides {
-   void yyerror (char const*);
-   int  yylex (YYSTYPE*, YYLTYPE*);
-   extern "C" int yyparse ();
-%}
+%code requires {
+   #include <string>
+   class driver;
+}
+
+%param { driver& drv }
 
 %code top {
+   #include "driver.hh"
    #include <vector>
    #include <string>
    #include <iostream> 
    #include <sstream>
-   // #include "lex.yy.c"
-   // #include "bis_out.hpp"
-   // #include "stack.hh"
 
    using namespace std;
 
@@ -54,7 +53,6 @@
 
    typedef AstNode* AstNodePtr;
 }
-
 
 %define api.value.type variant
 
@@ -187,6 +185,7 @@
 %token  <string>  EQ_OP "=="
 %token  <string>  NE_OP "!="
 
+%printer { yyo << $$; } <*>;
 %start translation_unit
 // %start primary_expression
 
@@ -709,16 +708,7 @@ identifier_list:
 
 %%
 
-// Epilogue
-
-namespace yy{
-
-    int main ()
-        {
-            yy::parser parse;
-            return parse.parse ();
-        }
-
-};
-
-
+void yy::parser::error (const location_type& l, const std::string& m)
+{
+  std::cerr << l << ": " << m << '\n';
+}

@@ -6,12 +6,20 @@ HEXEXPONENT   	([Pp][+-]?{DIGIT}+)
 FLOATSUFFIX		(f|F|l|L)
 INTSUFFIX       ((u|U)|(u|U)?(l|L|ll|LL)|(l|L|ll|LL)(u|U))
 
-%{
-#include <stdio.h>
+%option noyywrap nounput noinput batch debug 
 
-void count(void);
-void comment(void);
-void position(void);
+%{
+	#include <cerrno>
+	#include <climits>
+	#include <cstdlib>
+	#include <cstring>
+	#include <string>
+	#include "driver.hh"
+	#include "parser.hh"
+	#define YY_NO_UNISTD_H
+
+	yy::parser::symbol_type make_NUMBER (const std::string &s, const yy::parser::location_type& loc);
+	void comment(void);
 %}
 
 %%
@@ -19,118 +27,114 @@ void position(void);
 "//"[^\n]* 	 	{ /* consume //-comment */ }
 "#"[^\n]*		{ /* consume pre-processor directives */ }
 
-"auto" 			{ fprintf(yyout, "AUTO\n"); }
-"_Bool"			{ fprintf(yyout, "BOOL\n"); }
-"break"			{ fprintf(yyout, "BREAK\n"); }
-"case"			{ fprintf(yyout, "CASE\n"); }
-"char"			{ fprintf(yyout, "CHAR\n"); }
-"_Complex"		{ fprintf(yyout, "COMPLEX\n"); }
-"const"			{ fprintf(yyout, "CONST\n"); }
-"continue"		{ fprintf(yyout, "CONTINUE\n"); }
-"default"		{ fprintf(yyout, "DEFAULT\n"); }
-"do"			{ fprintf(yyout, "DO\n"); }
-"double"		{ fprintf(yyout, "DOUBLE\n"); }
-"else"			{ fprintf(yyout, "ELSE\n"); }
-"enum"			{ fprintf(yyout, "ENUM\n"); }
-"extern"		{ fprintf(yyout, "EXTERN\n"); }
-"float"			{ fprintf(yyout, "FLOAT\n"); }
-"for"			{ fprintf(yyout, "FOR\n"); }
-"goto"			{ fprintf(yyout, "GOTO\n"); }
-"if"			{ fprintf(yyout, "IF\n"); }
-"_Imaginary"	{ fprintf(yyout, "IMAGINARY\n"); }
-"inline"		{ fprintf(yyout, "INLINE\n"); }
-"int"			{ fprintf(yyout, "INT\n"); }
-"long"			{ fprintf(yyout, "LONG\n"); }
-"register"		{ fprintf(yyout, "REGISTER\n"); }
-"restrict"		{ fprintf(yyout, "RESTRICT\n"); }
-"return"		{ fprintf(yyout, "RETURN\n"); }
-"short"			{ fprintf(yyout, "SHORT\n"); }
-"signed"		{ fprintf(yyout, "SIGNED\n"); }
-"sizeof"		{ fprintf(yyout, "SIZEOF\n"); }
-"static"		{ fprintf(yyout, "STATIC\n"); }
-"struct"		{ fprintf(yyout, "STRUCT\n"); }
-"switch"		{ fprintf(yyout, "SWITCH\n"); }
-"typedef"		{ fprintf(yyout, "TYPEDEF\n"); }
-"union"			{ fprintf(yyout, "UNION\n"); }
-"unsigned"		{ fprintf(yyout, "UNSIGNED\n"); }
-"void"			{ fprintf(yyout, "VOID\n"); }
-"volatile"		{ fprintf(yyout, "VOLATILE\n"); }
-"while"			{ fprintf(yyout, "WHILE\n"); }
+"auto" 			{ return AUTO; }
+"_Bool"			{ return BOOL; }
+"break"			{ return BREAK; }
+"case"			{ return CASE; }
+"char"			{ return CHAR; }
+"_Complex"		{ return COMPLEX; }
+"const"			{ return CONST; }
+"continue"		{ return CONTINUE; }
+"default"		{ return DEFAULT; }
+"do"			{ return DO; }
+"double"		{ return DOUBLE; }
+"else"			{ return ELSE; }
+"enum"			{ return ENUM; }
+"extern"		{ return EXTERN; }
+"float"			{ return FLOAT; }
+"for"			{ return FOR; }
+"goto"			{ return GOTO; }
+"if"			{ return IF; }
+"_Imaginary"	{ return IMAGINARY; }
+"inline"		{ return INLINE; }
+"int"			{ return INT; }
+"long"			{ return LONG; }
+"register"		{ return REGISTER; }
+"restrict"		{ return RESTRICT; }
+"return"		{ return RETURN; }
+"short"			{ return SHORT; }
+"signed"		{ return SIGNED; }
+"sizeof"		{ return SIZEOF; }
+"static"		{ return STATIC; }
+"struct"		{ return STRUCT; }
+"switch"		{ return SWITCH; }
+"typedef"		{ return TYPEDEF; }
+"union"			{ return UNION; }
+"unsigned"		{ return UNSIGNED; }
+"void"			{ return VOID; }
+"volatile"		{ return VOLATILE; }
+"while"			{ return WHILE; }
 
-{ANYCHAR}({ANYCHAR}|{DIGIT})*		{ fprintf(yyout, "IDENTIFIER %s\n", yytext); }
+{ANYCHAR}({ANYCHAR}|{DIGIT})*		{ return IDENTIFIER; }
 
-0[xX]{HEXCHAR}+{INTSUFFIX}?	{ fprintf(yyout, "LITERAL %s\n", yytext); }
-0[0-7]*{INTSUFFIX}?			{ fprintf(yyout, "LITERAL %s\n", yytext); }
-[1-9]{DIGIT}*{INTSUFFIX}?	{ fprintf(yyout, "LITERAL %s\n", yytext); }
-ANYCHAR?'(\\.|[^\\'\n])+' 	{ fprintf(yyout, "LITERAL %s\n", yytext); }
+0[xX]{HEXCHAR}+{INTSUFFIX}?	{ return LITERAL; }
+0[0-7]*{INTSUFFIX}?			{ return LITERAL; }
+[1-9]{DIGIT}*{INTSUFFIX}?	{ return LITERAL; }
+ANYCHAR?'(\\.|[^\\'\n])+' 	{ return LITERAL; }
 
-{DIGIT}+{EXPONENT}{FLOATSUFFIX}?							{ fprintf(yyout, "LITERAL %s\n", yytext); }
-{DIGIT}*"."{DIGIT}+{EXPONENT}?{FLOATSUFFIX}?				{ fprintf(yyout, "LITERAL %s\n", yytext); }
-{DIGIT}+"."{DIGIT}*{EXPONENT}?{FLOATSUFFIX}?				{ fprintf(yyout, "LITERAL %s\n", yytext); }
-0[xX]{HEXCHAR}+{HEXEXPONENT}{FLOATSUFFIX}?					{ fprintf(yyout, "LITERAL %s\n", yytext); }
-0[xX]{HEXCHAR}*"."{HEXCHAR}+{HEXEXPONENT}{FLOATSUFFIX}?     { fprintf(yyout, "LITERAL %s\n", yytext); }
-0[xX]{HEXCHAR}+"."{HEXCHAR}*{HEXEXPONENT}{FLOATSUFFIX}?     { fprintf(yyout, "LITERAL %s\n", yytext); }
+{DIGIT}+{EXPONENT}{FLOATSUFFIX}?							{ return LITERAL; }
+{DIGIT}*"."{DIGIT}+{EXPONENT}?{FLOATSUFFIX}?				{ return LITERAL; }
+{DIGIT}+"."{DIGIT}*{EXPONENT}?{FLOATSUFFIX}?				{ return LITERAL; }
+0[xX]{HEXCHAR}+{HEXEXPONENT}{FLOATSUFFIX}?					{ return LITERAL; }
+0[xX]{HEXCHAR}*"."{HEXCHAR}+{HEXEXPONENT}{FLOATSUFFIX}?     { return LITERAL; }
+0[xX]{HEXCHAR}+"."{HEXCHAR}*{HEXEXPONENT}{FLOATSUFFIX}?     { return LITERAL; }
 
-\"(\\.|[^"\\])*\"	{ fprintf(yyout, "STRING_LITERAL %s\n", yytext); }
+\"(\\.|[^"\\])*\"	{ return STRING_LITERAL; }
 
-";"				{ fprintf(yyout, "SEMICOLON\n"); }
-","				{ fprintf(yyout, "COMMA\n"); }
-":"				{ fprintf(yyout, "COLON\n"); }
-"="				{ fprintf(yyout, "ASSIGN_OP\n"); }
-"("				{ fprintf(yyout, "LEFT_PAR\n"); }
-")"				{ fprintf(yyout, "RIGHT_PAR\n"); }
-"."				{ fprintf(yyout, "DOT\n"); }
-"&"				{ fprintf(yyout, "AMP\n"); }
-"!"				{ fprintf(yyout, "LOG_NOT_OP\n"); }
-"~"				{ fprintf(yyout, "BIN_NOT_OP\n"); }
-"-"				{ fprintf(yyout, "MINUS\n"); }
-"+"				{ fprintf(yyout, "PLUS\n"); }
-"*"				{ fprintf(yyout, "STAR\n"); }
-"/"				{ fprintf(yyout, "SLASH\n"); }
-"%"				{ fprintf(yyout, "MOD_OP\n"); }
-"<"				{ fprintf(yyout, "G_OP\n"); }
-">"				{ fprintf(yyout, "L_OP\n"); }
-"^"				{ fprintf(yyout, "BIN_XOR_OP\n"); }
-"|"				{ fprintf(yyout, "BIN_OR_OP\n"); }
-"?"				{ fprintf(yyout, "TERNARY_OP\n"); }
-("{"|"<%")		{ fprintf(yyout, "LEFT_CBRACKET\n"); }
-("}"|"%>")		{ fprintf(yyout, "RIGHT_CBRACKET\n"); }
-("["|"<:")		{ fprintf(yyout, "LEFT_BRACKET\n"); }
-("]"|":>")		{ fprintf(yyout, "RIGHT_BRACKET\n"); }
-"..."			{ fprintf(yyout, "ELLIPSIS\n"); }
-">>="			{ fprintf(yyout, "RIGHT_ASSIGN\n"); }
-"<<="			{ fprintf(yyout, "LEFT_ASSIGN\n"); }
-"+="			{ fprintf(yyout, "ADD_ASSIGN\n"); }
-"-="			{ fprintf(yyout, "SUB_ASSIGN\n"); }
-"*="			{ fprintf(yyout, "MUL_ASSIGN\n"); }
-"/="			{ fprintf(yyout, "DIV_ASSIGN\n"); }
-"%="			{ fprintf(yyout, "MOD_ASSIGN\n"); }
-"&="			{ fprintf(yyout, "AND_ASSIGN\n"); }
-"^="			{ fprintf(yyout, "XOR_ASSIGN\n"); }
-"|="			{ fprintf(yyout, "OR_ASSIGN\n"); }
-">>"			{ fprintf(yyout, "RIGHT_OP\n"); }
-"<<"			{ fprintf(yyout, "LEFT_OP\n"); }
-"++"			{ fprintf(yyout, "INC_OP\n"); }
-"--"			{ fprintf(yyout, "DEC_OP\n"); }
-"->"			{ fprintf(yyout, "PTR_OP\n"); }
-"&&"			{ fprintf(yyout, "AND_OP\n"); }
-"||"			{ fprintf(yyout, "OR_OP\n"); }
-"<="			{ fprintf(yyout, "LE_OP\n"); }
-">="			{ fprintf(yyout, "GE_OP\n"); }
-"=="			{ fprintf(yyout, "EQ_OP\n"); }
-"!="			{ fprintf(yyout, "NE_OP\n"); }
+";"				{ return SEMICOLON; }
+","				{ return COMMA; }
+":"				{ return COLON; }
+"="				{ return ASSIGN_OP; }
+"("				{ return LEFT_PAR; }
+")"				{ return RIGHT_PAR; }
+"."				{ return DOT; }
+"&"				{ return AMP; }
+"!"				{ return LOG_NOT_OP; }
+"~"				{ return BIN_NOT_OP; }
+"-"				{ return MINUS; }
+"+"				{ return PLUS; }
+"*"				{ return STAR; }
+"/"				{ return SLASH; }
+"%"				{ return MOD_OP; }
+"<"				{ return G_OP; }
+">"				{ return L_OP; }
+"^"				{ return BIN_XOR_OP; }
+"|"				{ return BIN_OR_OP; }
+"?"				{ return TERNARY_OP; }
+("{"|"<%")		{ return LEFT_CBRACKET; }
+("}"|"%>")		{ return RIGHT_CBRACKET; }
+("["|"<:")		{ return LEFT_BRACKET; }
+("]"|":>")		{ return RIGHT_BRACKET; }
+"..."			{ return ELLIPSIS; }
+">>="			{ return RIGHT_ASSIGN; }
+"<<="			{ return LEFT_ASSIGN; }
+"+="			{ return ADD_ASSIGN; }
+"-="			{ return SUB_ASSIGN; }
+"*="			{ return MUL_ASSIGN; }
+"/="			{ return DIV_ASSIGN; }
+"%="			{ return MOD_ASSIGN; }
+"&="			{ return AND_ASSIGN; }
+"^="			{ return XOR_ASSIGN; }
+"|="			{ return OR_ASSIGN; }
+">>"			{ return RIGHT_OP; }
+"<<"			{ return LEFT_OP; }
+"++"			{ return INC_OP; }
+"--"			{ return DEC_OP; }
+"->"			{ return PTR_OP; }
+"&&"			{ return AND_OP; }
+"||"			{ return OR_OP; }
+"<="			{ return LE_OP; }
+">="			{ return GE_OP; }
+"=="			{ return EQ_OP; }
+"!="			{ return NE_OP; }
 
 [ \t\v\n\f]		{}
 %%
 
-int yywrap() {
-	return 1;
-}
-
 void comment(void)
 {
 	char c, prev = 0;
-  
+
 	while ((c = input()) != 0)      /* (EOF maps to 0) */
 	{
 		if (c == '/' && prev == '*')
@@ -140,18 +144,28 @@ void comment(void)
 	perror("Unterminated comment");
 }
 
-int main(int argc , char** argv)
+yy::parser::symbol_type make_NUMBER(const std::string &s, const yy::parser::location_type& loc)
 {
-	extern FILE *yyin, *yyout;
+	errno = 0;
+	long n = strtol (s.c_str(), NULL, 10);
+	if (! (INT_MIN <= n && n <= INT_MAX && errno != ERANGE))
+		throw yy::parser::syntax_error (loc, "integer is out of range: " + s);
+	return yy::parser::make_NUMBER ((int) n, loc);
+}
 
-	if (argc != 2) {
-		printf("Usage: ./lexer [Name of file to translate]\n");
-		return 0;
-	}
+void driver::scan_begin()
+{
+  	yy_flex_debug = trace_scanning;
+  	if (file.empty () || file == "-")
+    	yyin = stdin;
+  	else if (!(yyin = fopen (file.c_str (), "r")))
+	{
+    	std::cerr << "cannot open " << file << ": " << strerror(errno) << '\n';
+    	exit (EXIT_FAILURE);
+    }
+}
 
-    yyin = fopen(argv[1], "r");
-    yyout = fopen("lexer.out", "w"); 
-    
-	yylex();
-    return 0;
+void driver::scan_end()
+{
+	fclose (yyin);
 }
