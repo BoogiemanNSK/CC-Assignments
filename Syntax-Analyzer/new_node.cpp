@@ -40,6 +40,8 @@ class AstNode {
 
 };
 
+typedef AstNode* AstNodePtr;
+
 int main(){
     AstNode* d = new AstNode("D", {});
     AstNode* a = new AstNode("A", {d});
