@@ -300,7 +300,7 @@ struct_declarator_list:
 struct_declarator:
 	declarator{ $$ = new StructDeclaratorNode($1);} |
 	COLON constant_expression { $$ = new StructDeclaratorNode($2);}|
-	declarator COLON constant_expression{{ $$ = new StructDeclaratorNode($1,$3);}}
+	declarator COLON constant_expression{ $$ = new StructDeclaratorNode($1,$3);}
 ;
 
 specifier_qualifier_list:
@@ -321,7 +321,7 @@ enum_specifier:
 
 enumerator_list:
 	enumerator {$$ = new EnumeratorListNode($1);}|
-	enumerator_list COMMA enumerator{{$1->children.push_back($3); $$ = $1 ;}}
+	enumerator_list COMMA enumerator{$1->children.push_back($3); $$ = $1 ;}
 ;
 
 enumerator: 

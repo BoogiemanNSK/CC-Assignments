@@ -6,6 +6,7 @@
     #include <iostream> 
     #include "syntax.tab.cc"
     #include "stack.hh"
+    #include "lex.yy.c"
 
     using namespace std;
 
