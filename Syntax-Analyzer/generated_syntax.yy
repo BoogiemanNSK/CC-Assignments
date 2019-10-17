@@ -1,109 +1,73 @@
-%language "c++"
+%skeleton "lalr1.cc" /* -*- C++ -*- */
+%require "3.4"
+%defines
+%define api.token.constructor
+%define api.value.type variant
+%define parse.assert
 
-%code provides {
-   void yyerror (char const*);
-   int  yylex (YYSTYPE*, YYLTYPE*);
-   extern "C" int yyparse ();
-%}
-
-%code top {
-   #include <vector>
-   #include <string>
-   #include <iostream> 
-   #include <sstream>
-   // #include "lex.yy.c"
-   // #include "bis_out.hpp"
-   // #include "stack.hh"
-
-   using namespace std;
-
-   class AstNode {
-      public:
-         vector<AstNode*> children;
-         string name;
-         
-         AstNode(string _name, vector<AstNode*> _children) {
-               children = _children;
-               name = _name;
-         }
-
-         AstNode(string _name){
-               children = vector<AstNode*>();
-               name = _name;
-         }
-         
-         void print_tree() {
-               cout << this->get_ident();
-               for (int i = 0; i < children.size(); i++) {
-                  cout << " " << children[i]->get_ident();
-               }
-               cout << endl;
-               for (int i = 0; i < children.size(); i++) {
-                  children[i] -> print_tree();
-               }
-         }
-
-         string get_ident() {
-               ostringstream buffer;
-               buffer << this << "_" << name;
-               string res = string(buffer.str());
-               return(res);
-         }
-
-   };
-
-   typedef AstNode* AstNodePtr;
+%code requires {
+  # include <string>
+  # include "astNode.hpp"
+  class driver;
 }
 
+// The parsing context.
+%param { driver& drv }
 
-%define api.value.type variant
+%code {
+# include "driver.hh"
+}
+
+%locations
+%define parse.trace
+%define parse.error verbose
 
 // Tokens
 
 // Keywords
-%token  <string>  AUTO
-%token  <string>  BOOL
-%token  <string>  BREAK
-%token  <string>  CASE
-%token  <string>  CHAR
-%token  <string>  COMPLEX
-%token  <string>  CONST
-%token  <string>  CONTINUE
-%token  <string>  DEFAULT
-%token  <string>  DO
-%token  <string>  DOUBLE
-%token  <string>  ELSE
-%token  <string>  ENUM
-%token  <string>  EXTERN
-%token  <string>  FLOAT
-%token  <string>  FOR
-%token  <string>  GOTO
-%token  <string>  IF
-%token  <string>  IMAGINARY
-%token  <string>  INLINE
-%token  <string>  INT
-%token  <string>  LONG
-%token  <string>  REGISTER
-%token  <string>  RESTRICT
-%token  <string>  RETURN
-%token  <string>  SHORT
-%token  <string>  SIGNED
-%token  <string>  SIZEOF
-%token  <string>  STATIC
-%token  <string>  STRUCT
-%token  <string>  SWITCH
-%token  <string>  TYPEDEF
-%token  <string>  UNION
-%token  <string>  UNSIGNED
-%token  <string>  VOID
-%token  <string>  VOLATILE
-%token  <string>  WHILE
+%token AUTO
+%token BOOL
+%token BREAK
+%token CASE
+%token CHAR
+%token COMPLEX
+%token CONST
+%token CONTINUE
+%token DEFAULT
+%token DO
+%token DOUBLE
+%token ELSE
+%token ENUM
+%token EXTERN
+%token FLOAT
+%token FOR
+%token GOTO
+%token IF
+%token IMAGINARY
+%token INLINE
+%token INT
+%token LONG
+%token REGISTER
+%token RESTRICT
+%token RETURN
+%token SHORT
+%token SIGNED
+%token SIZEOF
+%token STATIC
+%token STRUCT
+%token SWITCH
+%token TYPEDEF
+%token UNION
+%token UNSIGNED
+%token VOID
+%token VOLATILE
+%token WHILE
 
-%token <string> IDENTIFIER
+%token <std::string> IDENTIFIER
 
-%token <string> LITERAL // Numeric literal
+%token <std::string> LITERAL // Numeric literal
 
-%token <string> STRING_LITERAL  // String literal
+%token <std::string> STRING_LITERAL  // String literal
 
 // // Delimeters
 // %token ;
@@ -135,57 +99,57 @@
 
 // Delimeters
 
-%token  <string>  SEMICOLON ";"
-%token  <string>  COMMA ","
-%token  <string>  COLON ":"
-%token  <string>  LEFT_PAR "("
-%token  <string>  RIGHT_PAR ")"
-%token  <string>  DOT "."
-%token  <string>  LEFT_CBRACKET "{"
-%token  <string>  RIGHT_CBRACKET "}"
-%token  <string>  LEFT_BRACKET "["
-%token  <string>  RIGHT_BRACKET "]"
+%token  SEMICOLON ";"
+%token  COMMA ","
+%token  COLON ":"
+%token  LEFT_PAR "("
+%token  RIGHT_PAR ")"
+%token  DOT "."
+%token  LEFT_CBRACKET "{"
+%token  RIGHT_CBRACKET "}"
+%token  LEFT_BRACKET "["
+%token  RIGHT_BRACKET "]"
 
 // Operators
 
-%token  <string>  ASSIGN_OP "="
-%token  <string>  AMP "&"
-%token  <string>  LOG_NOT_OP "!"
-%token  <string>  BIN_NOT_OP "~"
-%token  <string>  MINUS "-"
-%token  <string>  PLUS "+"
-%token  <string>  STAR "*"
-%token  <string>  SLASH "/"
-%token  <string>  MOD_OP "%"
-%token  <string>  G_OP "<"
-%token  <string>  L_OP ">"
-%token  <string>  BIN_XOR_OP "^"
-%token  <string>  BIN_OR_OP "|"
-%token  <string>  TERNARY_OP "?"
+%token  ASSIGN_OP "="
+%token  AMP "&"
+%token  LOG_NOT_OP "!"
+%token  BIN_NOT_OP "~"
+%token  MINUS "-"
+%token  PLUS "+"
+%token  STAR "*"
+%token  SLASH "/"
+%token  MOD_OP "%"
+%token  G_OP "<"
+%token  L_OP ">"
+%token  BIN_XOR_OP "^"
+%token  BIN_OR_OP "|"
+%token  TERNARY_OP "?"
 
 
-%token  <string>  ELLIPSIS "..."
-%token  <string>  RIGHT_ASSIGN ">>="
-%token  <string>  LEFT_ASSIGN "<<="
-%token  <string>  ADD_ASSIGN "+="
-%token  <string>  SUB_ASSIGN "-="
-%token  <string>  MUL_ASSIGN "*="
-%token  <string>  DIV_ASSIGN "/="
-%token  <string>  MOD_ASSIGN "%="
-%token  <string>  AND_ASSIGN "&="
-%token  <string>  XOR_ASSIGN "^="
-%token  <string>  OR_ASSIGN "|="
-%token  <string>  RIGHT_OP ">>"
-%token  <string>  LEFT_OP "<<"
-%token  <string>  INC_OP "++"
-%token  <string>  DEC_OP "--"
-%token  <string>  PTR_OP "->"
-%token  <string>  AND_OP "&&"
-%token  <string>  OR_OP "||"
-%token  <string>  LE_OP "<="
-%token  <string>  GE_OP ">="
-%token  <string>  EQ_OP "=="
-%token  <string>  NE_OP "!="
+%token  ELLIPSIS "..."
+%token  RIGHT_ASSIGN ">>="
+%token  LEFT_ASSIGN "<<="
+%token  ADD_ASSIGN "+="
+%token  SUB_ASSIGN "-="
+%token  MUL_ASSIGN "*="
+%token  DIV_ASSIGN "/="
+%token  MOD_ASSIGN "%="
+%token  AND_ASSIGN "&="
+%token  XOR_ASSIGN "^="
+%token  OR_ASSIGN "|="
+%token  RIGHT_OP ">>"
+%token  LEFT_OP "<<"
+%token  INC_OP "++"
+%token  DEC_OP "--"
+%token  PTR_OP "->"
+%token  AND_OP "&&"
+%token  OR_OP "||"
+%token  LE_OP "<="
+%token  GE_OP ">="
+%token  EQ_OP "=="
+%token  NE_OP "!="
 
 %start translation_unit
 // %start primary_expression
@@ -711,14 +675,14 @@ identifier_list:
 
 // Epilogue
 
-namespace yy{
+// namespace yy{
 
-    int main ()
-        {
-            yy::parser parse;
-            return parse.parse ();
-        }
+//     int main ()
+//         {
+//             yy::parser parse;
+//             return parse.parse ();
+//         }
 
-};
+// };
 
 
