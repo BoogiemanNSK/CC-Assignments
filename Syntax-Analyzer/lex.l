@@ -153,7 +153,8 @@ ANYCHAR?'(\\.|[^\\'\n])+' 	{ return yy::parser::make_LITERAL(yytext, loc); }
 "=="			{ return yy::parser::make_EQ_OP(loc); }
 "!="			{ return yy::parser::make_NE_OP(loc); }
 
-[ \t\v\n\f]		{}
+[ \t\v\f]		{loc.step ();}
+\n+				{loc.lines (yyleng); loc.step ();}
 %%
 
 yy::parser::symbol_type
@@ -182,7 +183,7 @@ void comment(void)
 {
 	char c, prev = 0;
   
-	while ((c = input()) != 0)      /* (EOF maps to 0) */
+	while ((c = yyinput()) != 0)      /* (EOF maps to 0) */
 	{
 		if (c == '/' && prev == '*')
 			return;
